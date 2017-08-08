@@ -88,8 +88,7 @@ bwplot(green_data$Rent~green_data$Energystar|green_data$class_b, ylab='RENT',  x
 Whether you are a class a building or class b building and Leed certified vs. Energystar certified has really no effect on Rent prices. There is not much variability in the average amount of rent for these categories.
 
 ```{r, echo=TRUE}
-# Energy star has less cooling degree days, which means they use less energy
-#which means utilites are cheaper and same for heating degree days
+
 par(mfrow = c(1,2))
 plot(green_data$Energystar, green_data$cd_total_07, xlab='ENERGYSTAR', ylab='COOLING DEGREE DAYS', col='blue')
 plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE DAYS', col='blue')
@@ -97,7 +96,7 @@ plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE 
 ```
 From the plots above you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy, and having lower demand. Energystar certified buildings also have less cooling days than buildings that are not energystar certified or not leed certified. 
 ```{r, echo=TRUE}
-#LEED CERTIFIED BUILDINGS cost more on cooling and heating days
+
 par(mfrow = c(1,2))
 plot(green_data$Energystar, green_data$hd_total07, xlab='ENERGYSTAR', ylab='HEATING DEGREE DAYS', col='red')
 plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE DAYS', col='red')
@@ -105,17 +104,18 @@ plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE D
 ```
 The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings hace a lot less heating days on average than LEED buildings. Energystar certified buildings also have less heating days than buildings that are not energystar certified or not leed certified. 
 ```{r, echo=TRUE}
-#CLASS A OR CLASS B classification for energystar and for leed
-par(mfrow = c(1,2))
-plot(green_data$LEED, green_data$class_a, xlab='LEED', ylab='CLASS A')
-plot(green_data$LEED, green_data$class_b,  xlab='LEED', ylab='CLASS B')
-
+plot(green_data$size, green_data$Rent, xlab='SIZE', ylab='RENT')
+cor(green_data$size, green_data$Rent)
+```
+There is not really a linear relationship between age and rent of buildings like one would expect. We can try a lattice plot to see rent vs age grouped by energystar vs. not energystar and leed and not leed certified.
+```{r, echo=TRUE}
+xyplot(green_data$Rent~green_data$age|green_data$LEED, main='Scatterplots by LEED Certification', ylab='RENT', xlab='age')
 ```
 ```{r, echo=TRUE}
-par(mfrow = c(1,2))
-plot(green_data$Energystar, green_data$class_a, xlab='ENERGYSTAR', ylab='CLASS A')
-plot(green_data$Energystar, green_data$class_b,  xlab='ENERGYSTAR', ylab='CLASS B')
+xyplot(green_data$Rent~green_data$age|green_data$Energystar, main='Scatterplots by Energystar Certification', ylab='RENT', xlab='age')
 ```
+There is no relationship between age and rent no matter which category a building falls into, be it LEED certified, ENERGYSTAR certified, or not certified. 
+
 
 #### Conclusion
 
