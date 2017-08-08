@@ -1,0 +1,79 @@
+---
+title: "Assignment 1 - Scott"
+author: "Gaby Lio"
+date: "August 8, 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+## Probability Practice
+![](image_01.png)
+
+#### Part A
+The fraction of people who answered yes given that they are truthful clickers is 71.43%.
+
+#### Part B
+The probability of that someone has the disease given that they test positive is very low, only 2.42%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 97.58% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended. 
+
+## Exploratory Analysis: Green Buildings
+
+```{r, echo=TRUE}
+green_data = read.csv('greenbuildings.csv')
+
+green_data$renovated = as.factor(green_data$renovated)
+green_data$class_a = as.factor(green_data$class_a)
+green_data$class_b = as.factor(green_data$class_b)
+green_data$green_rating = as.factor(green_data$green_rating)
+green_data$LEED = as.factor(green_data$LEED)
+green_data$Energystar = as.factor(green_data$Energystar)
+green_data$net = as.factor(green_data$net)
+green_data$amenities = as.factor(green_data$amenities)
+
+par(mfrow = c(1,2))
+
+# Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
+plot(green_data$LEED, green_data$Rent, xlab='LEED CERTIFED', ylab='RENT', col='pink')
+plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='pink')
+
+#compare rent in the cluster market
+plot(green_data$LEED, green_data$cluster_rent, xlab='LEED CERTIFED', ylab='CLUSTER RENT', col='pink')
+plot(green_data$Energystar, green_data$cluster_rent, xlab='ENERGYSTAR CERTIFED', ylab='CLUSTER RENT', col='pink')
+
+### Being LEED certified tenants pay slightly lower amount for yout rent per square foot
+#versus not being LEEd certified and being Energystar certified tenants pay more than if you are
+#not per squarefoot in rent 
+
+
+# CLASS A Buildings can charge tenants higher rent, Class B buildings cannot
+#in comparison to Class C buildings
+plot(green_data$class_a, green_data$Rent, xlab='CLASS A', ylab='RENT', col='light blue')
+plot(green_data$class_b, green_data$Rent, xlab='CLASS B', ylab='RENT', col='light green')
+
+# Energy star has less cooling degree days, which means they use less energy
+#which means utilites are cheaper and same for heating degree days
+plot(green_data$Energystar, green_data$cd_total_07, xlab='ENERGYSTAR', ylab='COOLING DEGREE DAYS', col='grey')
+plot(green_data$Energystar, green_data$hd_total07, xlab='ENERGYSTAR', ylab='HEATING DEGREE DAYS', col='yellow')
+
+#LEED CERTIFIED BUILDINGS cost more on cooling and heating days
+plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE DAYS', col='grey')
+plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE DAYS', col='burlywood')
+
+
+#CLASS A OR CLASS B classification for energystar and for leed
+plot(green_data$LEED, green_data$class_a, xlab='LEED', ylab='CLASS A')
+plot(green_data$LEED, green_data$class_b,  xlab='LEED', ylab='CLASS B')
+
+plot(green_data$Energystar, green_data$class_a, xlab='ENERGYSTAR', ylab='CLASS A')
+plot(green_data$Energystar, green_data$class_b,  xlab='ENERGYSTAR', ylab='CLASS B')
+```
+
+
+
+```{r pressure, echo=TRUE}
+
+```
+
