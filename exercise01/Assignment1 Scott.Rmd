@@ -51,7 +51,7 @@ plot(green_data$LEED, green_data$Gas_Costs, xlab='LEED CERTIFED', ylab='GAS COST
 plot(green_data$Energystar, green_data$Gas_Costs, xlab='ENERGYSTAR CERTIFED', ylab='GAS COSTS', col='burlywood')
 ```
 
-From the plots above you can see that if you are ENERGYSTAR certifies gas costs are the same as weather you are not and they are low. If you are LEEDS certified. ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
+From the plots above you can see that if you are ENERGYSTAR certified gas costs are the same as weather you are not and they are low. If you are LEEDS certified though, gas costs are actually higher, thus ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
 
 ```{r, echo=TRUE}
 #compare LEEDS vs. ENERGY STAR in ELECTRICITY COSTS
@@ -74,6 +74,18 @@ library(lattice)
 bwplot(green_data$Rent~green_data$Energystar|green_data$class_a, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class A and ENERGYSTAR')
 ```
 
+
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$Rent~green_data$LEED|green_data$class_b, ylab='RENT',  xlab='LEED vs. NOT LEED', main='Rent by Class B and LEED')
+
+```
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$Rent~green_data$Energystar|green_data$class_b, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class B and ENERGYSTAR')
+
+```
+Whether you are a class a building or class b building and Leed certified vs. Energystar certified has really no effect on Rent prices. There is not much variability in the average amount of rent for these categories.
 
 ```{r, echo=TRUE}
 # Energy star has less cooling degree days, which means they use less energy
@@ -104,5 +116,6 @@ plot(green_data$Energystar, green_data$class_a, xlab='ENERGYSTAR', ylab='CLASS A
 plot(green_data$Energystar, green_data$class_b,  xlab='ENERGYSTAR', ylab='CLASS B')
 ```
 
+#### Conclusion
 
 
