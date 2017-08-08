@@ -34,12 +34,18 @@ green_data$net = as.factor(green_data$net)
 green_data$amenities = as.factor(green_data$amenities)
 
 par(mfrow = c(1,2))
+```
 
+```{r, echo=TRUE}
 # Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
+par(mfrow = c(1,2))
 plot(green_data$LEED, green_data$Rent, xlab='LEED CERTIFED', ylab='RENT', col='pink')
 plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='pink')
+```
 
+```{r, echo=TRUE}
 #compare rent in the cluster market
+par(mfrow = c(1,2))
 plot(green_data$LEED, green_data$cluster_rent, xlab='LEED CERTIFED', ylab='CLUSTER RENT', col='pink')
 plot(green_data$Energystar, green_data$cluster_rent, xlab='ENERGYSTAR CERTIFED', ylab='CLUSTER RENT', col='pink')
 
@@ -47,33 +53,44 @@ plot(green_data$Energystar, green_data$cluster_rent, xlab='ENERGYSTAR CERTIFED',
 #versus not being LEEd certified and being Energystar certified tenants pay more than if you are
 #not per squarefoot in rent 
 
+```
 
+```{r, echo=TRUE}
 # CLASS A Buildings can charge tenants higher rent, Class B buildings cannot
 #in comparison to Class C buildings
+par(mfrow = c(1,2))
 plot(green_data$class_a, green_data$Rent, xlab='CLASS A', ylab='RENT', col='light blue')
 plot(green_data$class_b, green_data$Rent, xlab='CLASS B', ylab='RENT', col='light green')
+```
 
+```{r, echo=TRUE}
 # Energy star has less cooling degree days, which means they use less energy
 #which means utilites are cheaper and same for heating degree days
+par(mfrow = c(1,2))
 plot(green_data$Energystar, green_data$cd_total_07, xlab='ENERGYSTAR', ylab='COOLING DEGREE DAYS', col='grey')
 plot(green_data$Energystar, green_data$hd_total07, xlab='ENERGYSTAR', ylab='HEATING DEGREE DAYS', col='yellow')
+```
 
+```{r, echo=TRUE}
 #LEED CERTIFIED BUILDINGS cost more on cooling and heating days
+par(mfrow = c(1,2))
 plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE DAYS', col='grey')
 plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE DAYS', col='burlywood')
 
+```
 
+```{r, echo=TRUE}
 #CLASS A OR CLASS B classification for energystar and for leed
+par(mfrow = c(1,2))
 plot(green_data$LEED, green_data$class_a, xlab='LEED', ylab='CLASS A')
 plot(green_data$LEED, green_data$class_b,  xlab='LEED', ylab='CLASS B')
 
+```
+```{r, echo=TRUE}
+par(mfrow = c(1,2))
 plot(green_data$Energystar, green_data$class_a, xlab='ENERGYSTAR', ylab='CLASS A')
 plot(green_data$Energystar, green_data$class_b,  xlab='ENERGYSTAR', ylab='CLASS B')
 ```
 
 
-
-```{r pressure, echo=TRUE}
-
-```
 
