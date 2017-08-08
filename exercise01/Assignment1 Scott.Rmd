@@ -20,7 +20,7 @@ The fraction of people who answered yes given that they are truthful clickers is
 The probability of that someone has the disease given that they test positive is very low, only 2.42%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 97.58% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
 
 ## Exploratory Analysis: Green Buildings
-
+First we need to clean up the data a little bit and make sure the categorical variables are changed to factors in R.
 ```{r, echo=TRUE}
 green_data = read.csv('greenbuildings.csv')
 
@@ -32,36 +32,48 @@ green_data$LEED = as.factor(green_data$LEED)
 green_data$Energystar = as.factor(green_data$Energystar)
 green_data$net = as.factor(green_data$net)
 green_data$amenities = as.factor(green_data$amenities)
-
-par(mfrow = c(1,2))
 ```
 
+We decided to plot LEED vs. RENT and ENERGYSTAR vs. RENT to see if there was a difference between being LEED or ENERGYSTAR certified vs. not being certified. The results are belw.
 ```{r, echo=TRUE}
 # Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
 par(mfrow = c(1,2))
 plot(green_data$LEED, green_data$Rent, xlab='LEED CERTIFED', ylab='RENT', col='pink')
-plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='pink')
+plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='burlywood')
 ```
+
+As you can see from the plots above, being LEED certified does not increase the amount you can charge your tenant for rent. The average is actually slightly lower than the average of those buildings who are not LEED certified. In contrast, being ENERGYSTAR certified is advantageous becuase you can charge tenants more for rent than if you were a building that was not ENERGYSTAR certified. 
 
 ```{r, echo=TRUE}
-#compare rent in the cluster market
+#compare LEEDS vs. ENERGY STAR in Gas costs
 par(mfrow = c(1,2))
-plot(green_data$LEED, green_data$cluster_rent, xlab='LEED CERTIFED', ylab='CLUSTER RENT', col='pink')
-plot(green_data$Energystar, green_data$cluster_rent, xlab='ENERGYSTAR CERTIFED', ylab='CLUSTER RENT', col='pink')
-
-### Being LEED certified tenants pay slightly lower amount for yout rent per square foot
-#versus not being LEEd certified and being Energystar certified tenants pay more than if you are
-#not per squarefoot in rent 
-
+plot(green_data$LEED, green_data$Gas_Costs, xlab='LEED CERTIFED', ylab='GAS COSTS', col='pink')
+plot(green_data$Energystar, green_data$Gas_Costs, xlab='ENERGYSTAR CERTIFED', ylab='GAS COSTS', col='burlywood')
 ```
+
+From the plots above you can see that if you are ENERGYSTAR certifies gas costs are the same as weather you are not and they are low. If you are LEEDS certified. ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
 
 ```{r, echo=TRUE}
-# CLASS A Buildings can charge tenants higher rent, Class B buildings cannot
-#in comparison to Class C buildings
+#compare LEEDS vs. ENERGY STAR in ELECTRICITY COSTS
 par(mfrow = c(1,2))
-plot(green_data$class_a, green_data$Rent, xlab='CLASS A', ylab='RENT', col='light blue')
-plot(green_data$class_b, green_data$Rent, xlab='CLASS B', ylab='RENT', col='light green')
+plot(green_data$LEED, green_data$Electricity_Costs, xlab='LEED CERTIFED', ylab='ELECTRIC COSTS', col='pink')
+plot(green_data$Energystar, green_data$Electricity_Costs, xlab='ENERGYSTAR CERTIFED', ylab='ELECTRIC COSTS', col='burlywood')
 ```
+
+Electricity costs are definitely higher in the geographic regions for which ENERGYSTAR certified buildings are locared. They are higher than buildings with no certification and also higher than buildings who are LEED certified. LEED certified buildings have lower electricity costs than buildings who are not LEED certified.
+
+
+```{r, echo=TRUE}
+
+library(lattice)
+bwplot(green_data$Rent~green_data$LEED|green_data$class_a, ylab='RENT',  xlab='LEED vs. NOT LEED', main='Rent by Class A and LEED')
+```
+```{r, echo=TRUE}
+
+library(lattice)
+bwplot(green_data$Rent~green_data$Energystar|green_data$class_a, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class A and ENERGYSTAR')
+```
+
 
 ```{r, echo=TRUE}
 # Energy star has less cooling degree days, which means they use less energy
