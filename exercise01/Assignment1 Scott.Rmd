@@ -194,7 +194,7 @@ bwplot(green_data$Rent~green_data$renovated|green_data$Energystar, ylab='RENT', 
 ```
 Whether or not either a Energystar certified building or a LEED certified building were renovated seemed to have little to no effect on the rent.
 
-Lastly, we tried to see if rent was higher for those buildings that had amenities, and then factored in whether they were green certified or not.
+We tried to see if rent was higher for those buildings that had amenities, and then factored in whether they were green certified or not.
 ```{r, echo=TRUE}
 plot(green_data$amenities, green_data$Rent, xlab='AMENITIES', ylab='RENT', col='beige')
 ```
@@ -203,7 +203,26 @@ library(lattice)
 bwplot(green_data$amenities~ 
          green_data$Rent|green_data$green_rating, xlab='AMENITIES', ylab='RENT', main='RENT by AMENITIES AND GREEN RATING')
 ```
-Amenities do not seem to affect RENT.
+Amenities do not seem to affect RENT. Lastly, we wanted to see if the variable net played a role in the higher rent prices. First we plotted net vs green certifeid to see if most green certified buildings have tenants pay for their utility costs, or if they are included in the quoted prices.
+
+```{r, echo=TRUE}
+plot(green_data$net, green_data$green_rating, xlab='NET', ylab='GREEN RATING')
+
+```
+According to this plot, for those who pay for their own utilities 80% are not green buildings and for those who don't pay their own utilites about 90% are not green buildings. So 10% of those who don't pay their utilities are green, and 20% of those who do pay their utilites are green.
+```{r, echo=TRUE}
+plot(green_data$net, green_data$Rent, xlab='NET', ylab='RENT', col='beige')
+
+```
+From this plot you can see that those who pay their own utilities have a slightly lower rent, which is to be expected than those who do not pay their own utilities. We finished by making a lattice scatterplot of rent by net and green to see how rent is affected by these two variables. 
+
+```{r, echo=TRUE}
+bwplot(green_data$Rent~ green_data$net|green_data$green_rating, xlab='NET', ylab='RENT', main='BOXPLOT of RENT by NET and GREEN CERTIFIED')
+
+```
+These box plots show us that there is really not much variability in the rent whether you are green certified or not and whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is onbious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher, but only slightly. 
+
+
 #### Conclusion
 
 
