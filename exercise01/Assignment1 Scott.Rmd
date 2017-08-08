@@ -115,7 +115,39 @@ xyplot(green_data$Rent~green_data$age|green_data$LEED, main='Scatterplots by LEE
 xyplot(green_data$Rent~green_data$age|green_data$Energystar, main='Scatterplots by Energystar Certification', ylab='RENT', xlab='age')
 ```
 There is no relationship between age and rent no matter which category a building falls into, be it LEED certified, ENERGYSTAR certified, or not certified. 
+```{r, echo=TRUE}
+par(mfrow=c(1,2))
+plot(green_data$LEED, green_data$leasing_rate, ylab='LEASING RATE', xlab='LEED CERTIFIED', col='pink')
+plot(green_data$Energystar, green_data$leasing_rate, ylab='LEASING RATE', xlab='ENERGYSTAR CERTIFIED', col='burlywood')
+```
 
+On average both LEED and Energystar buildings have a higher leasing rate than buildings who are not leed or energystar certified. With the average being aorund 
+```{r, echo=TRUE}
+hist(green_data$Rent)
+
+```
+```{r, echo=TRUE}
+par(mfrow = c(1,2))
+plot(green_data$LEED, green_data$stories, xlab='LEED CERTIFED', ylab='# of STORIES', col='pink')
+plot(green_data$Energystar, green_data$stories, xlab='ENERGYSTAR CERTIFED', ylab='# of STORIES', col='burlywood')
+```
+It appears that the LEED certified and ENERGYSTAR certified buildings both have more stories than buildings without these certifcations, but only a slight number more.
+
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$Rent~green_data$renovated|green_data$LEED, ylab='RENT',  xlab='RENOVATED vs. NOT RENOVATED', main='Rent by LEED and RENOVATED')
+
+```
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$Rent~green_data$renovated|green_data$Energystar, ylab='RENT',  xlab='RENOVATED vs. NOT RENOVATED', main='Rent by ENERGYSTAR and RENOVATED')
+
+```
+Whether or not either a Energystar certified building or a LEED certified building were renovated has no effect on the rent.
+
+```{r, echo=TRUE}
+
+```
 
 #### Conclusion
 
