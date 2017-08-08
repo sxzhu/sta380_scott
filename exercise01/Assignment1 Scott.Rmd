@@ -95,7 +95,7 @@ plot(green_data$Energystar, green_data$cd_total_07, xlab='ENERGYSTAR', ylab='COO
 plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE DAYS', col='blue')
 
 ```
-From the plots above you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy, and having lower demand. Energystar certified buildings also have less cooling and heating days than buildings that are not energystar certified or not leed certified. 
+From the plots above you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy, and having lower demand. Energystar certified buildings also have less cooling days than buildings that are not energystar certified or not leed certified. 
 ```{r, echo=TRUE}
 #LEED CERTIFIED BUILDINGS cost more on cooling and heating days
 par(mfrow = c(1,2))
@@ -103,7 +103,7 @@ plot(green_data$Energystar, green_data$hd_total07, xlab='ENERGYSTAR', ylab='HEAT
 plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE DAYS', col='red')
 
 ```
-The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings hace a lot less heating days on average than LEED buildings. 
+The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings hace a lot less heating days on average than LEED buildings. Energystar certified buildings also have less heating days than buildings that are not energystar certified or not leed certified. 
 ```{r, echo=TRUE}
 #CLASS A OR CLASS B classification for energystar and for leed
 par(mfrow = c(1,2))
