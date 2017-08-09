@@ -206,10 +206,12 @@ bwplot(green_data$amenities~
 Amenities do not seem to affect RENT. Lastly, we wanted to see if the variable net played a role in the higher rent prices. First we plotted net vs green certifeid to see if most green certified buildings have tenants pay for their utility costs, or if they are included in the quoted prices.
 
 ```{r, echo=TRUE}
-plot(green_data$net, green_data$green_rating, xlab='NET', ylab='GREEN RATING')
-
+plot(green_data$net, green_data$Energystar, xlab='ENERGYSTAR', ylab='NET')
+plot(green_data$net, green_data$LEED, xlab='LEED', ylab='NET')
+plot(green_data$net, green_data$green_rating, xlab='GREEN', ylab='NET')
 ```
-According to this plot, for those who pay for their own utilities 80% are not green buildings and for those who don't pay their own utilites about 90% are not green buildings. So 10% of those who don't pay their utilities are green, and 20% of those who do pay their utilites are green.
+We wanted to run these plots to make sure that the rent was not higher for Energystar/LEED/GREEN buildings becuase they make most of their tenants pay for utilities, in comparison to not green buildings. 
+
 ```{r, echo=TRUE}
 plot(green_data$net, green_data$Rent, xlab='NET', ylab='RENT', col='beige')
 
@@ -220,9 +222,18 @@ From this plot you can see that those who pay their own utilities have a slightl
 bwplot(green_data$Rent~ green_data$net|green_data$green_rating, xlab='NET', ylab='RENT', main='BOXPLOT of RENT by NET and GREEN CERTIFIED')
 
 ```
-These box plots show us that there is really not much variability in the rent whether you are green certified or not and whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is onbious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher, but only slightly. 
+These box plots show us that there is really not much variability in the rent whether you are green certified or not and whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is obvious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher in comparison to when you are, but only slightly. 
 
 
 #### Conclusion
+After looking over all of the plots, it is apparent that the Excel Guru on her staff had made a mistake. The Excel guru failed to split the green certified buildings into their particular certifications (LEEDS vs. ENERGYSTAR), when running his anlaysis. This was something we could do easily with plots. 
+
+When we do this you can see that only those buildings who are ENERGYSTAR certified can actually charge higher rent to tenants per square foot. The LEED certified buildings charge less per square foot in terms of rent. This type of pattern can be seen throughout the data. When looking at gas costs for example, buildings who were Energystar certified had lower gas costs than buildings who were LEED certified. The one contrast to this was the electricity costs, where having a Energystar certified building tended to have higher electricity costs than LEED certified buildings and even average buildings with no green certifications. The Class of the building seemed to have no affect on the costs of rent regardless of their certifcation. The same results were found for Age of the builiding as well.
+
+We also found that heating and cooling days were much lower for energystar certified buildings, while leed certified buildings had higher counts of heating and cooling days.It was interesting to see that both LEED and ENERGYSTAR certified buildings had slighly higher leasing rates than buildings without green certifcations.
+
+So the excel guru was right in one aspect, if you make a green certified building, you will have a high occupancy rate no matter the certifcation as long as it is green. This means we would not have a problem finding tenants. The part he was wrong in though was that just being they were green certified they would yield a profit. According to the data it looks like if you must be Energystar certified to make these profits. Energystar has a low amount of cooling days and heating days in comparison to LEED certified buildings, whose average heating and cooling days are above the average of buildings who are not green certified. This means that Energystar buildings use less energy and have a lower demand. Energystar buildings can also charge a higher amount per square foot of rent than buildings without green certifcations, and definitely higher than those with LEED certifications. 
+
+Lastly, we had to make sure these higher rent charges were not due to the fact that Energystar buildings had utilites included in rent, and that is what was inflating the higher rent cost for tenants. We  examined the spineplots and found that utilities did seem to be included in the rent of energystar buildings about 90% of the time, but utlities was included in rent at an even higher percentage for non energystar buildings. Ultimately, this could not be the reason why the rent charges were inflagted if across the board this was the practice. The real estate developer should invest in beoming a green building only if they go for the Energystar certified option. 
 
 
