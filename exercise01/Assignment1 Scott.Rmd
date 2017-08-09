@@ -234,6 +234,7 @@ From this plot you can see that those who pay their own utilities have a slightl
 bwplot(green_data$Rent~ green_data$net|green_data$green_rating, xlab='NET', ylab='RENT', main='BOXPLOT of RENT by NET and GREEN CERTIFIED')
 
 ```
+
 These box plots show us that there is really not much variability in the rent whether you are green certified or not and whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is obvious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher in comparison to when you are, but only slightly. 
 
 
@@ -247,5 +248,9 @@ We also found that heating and cooling days were much lower for energystar certi
 So the excel guru was right in one aspect, if you make a green certified building, you will have a high occupancy rate no matter the certifcation as long as it is green. This means we would not have a problem finding tenants. The part he was wrong in though was that just being they were green certified they would yield a profit. According to the data it looks like if you must be Energystar certified to make these profits. Energystar has a low amount of cooling days and heating days in comparison to LEED certified buildings, whose average heating and cooling days are above the average of buildings who are not green certified. This means that Energystar buildings use less energy and have a lower demand. Energystar buildings can also charge a higher amount per square foot of rent than buildings without green certifcations, and definitely higher than those with LEED certifications. 
 
 Lastly, we had to make sure these higher rent charges were not due to the fact that Energystar buildings had utilites included in rent, and that is what was inflating the higher rent cost for tenants. We  examined the spineplots and found that utilities did seem to be included in the rent of energystar buildings about 90% of the time, but utlities was included in rent at an even higher percentage for non energystar buildings. Ultimately, this could not be the reason why the rent charges were inflagted if across the board this was the practice. The real estate developer should invest in beoming a green building only if they go for the Energystar certified option becuase of the cost savings, the rent upcharge, and the ability of the building to last longer without renovations. 
+
+### Bootstrapping
+
+### Market Segmentation
 
 
