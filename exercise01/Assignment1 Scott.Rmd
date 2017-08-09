@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 The fraction of people who answered yes given that they are truthful clickers is 71.43%.
 
 #### Part B
-The probability of that someone has the disease given that they test positive is very low, only 2.42%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 97.58% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
+The probability of that someone has the disease given that they test positive is very low, only 19.88%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.12% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
 
 ## Exploratory Analysis: Green Buildings
 First we need to clean up the data a little bit and make sure the categorical variables are changed to factors in R.
