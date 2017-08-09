@@ -10,13 +10,54 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
-## Probability Practice
-![](image_01.png)
+## Probability practice
+**Part A: What fraction of people who are truthful clickers answered yes?**
 
-#### Part A
+* P(RC)=0.3
+*	P(TC)=0.7
+*	P(Y|RC)=0.5
+*	P(N|RC)=0.5
+*	P(Y)=0.65
+*	P(N)=0.35
+
+|   |RC|TC|Total|
+|:--|--:|--:|--:|
+|Y |0.15|0.5|0.65|
+|N |0.15|0.2|0.35|
+|Total|0.3|0.7|1|
+
+P(Y|TC) = 0.5/0.7 = 71.4%
+
 The fraction of people who answered yes given that they are truthful clickers is 71.43%.
 
-#### Part B
+**Part B: Suppose someone tests positive. What is the probability that they have the disease? In light of this calculation, do you envision any problems in implementing a universal testing policy for the disease?**
+
+P(+|D)=0.9993
+
+P(-|Dc)=0.9999
+
+P(D) = 0.000025
+
+P(Dc) = 1-0.000025=0.999975
+
+
+|   |+|-|Total|
+|:--|--:|--:|--:|
+|D |2.49825e-05|0.00000018|0.0025|
+|Dc|1e-04|0.999875|0.999975|
+|Total|0.0001249825|0.999875|1|
+
+
+P(+,D) = P(+|D) * P(D) = 2.49825e-05
+
+P(-,Dc) =P(-|Dc)* P(Dc) = 0.999875
+
+P(+,Dc) = P(Dc) - P(-,Dc) = 0.999975-0.999875 = 1e-04
+
+P(+) = P(+,D)+P(+,Dc)=2.49825e-05+1e-04=0.0001249825
+
+P(D|+) =P(+,D)/P(+)=2.49825e-05/0.0001249825=0.199888 = **19.99%**
+
 The probability of that someone has the disease given that they test positive is very low, only 19.88%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.12% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
 
 ## Exploratory Analysis: Green Buildings
