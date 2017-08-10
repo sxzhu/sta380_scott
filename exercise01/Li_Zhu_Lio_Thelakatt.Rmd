@@ -295,20 +295,19 @@ Lastly, we had to make sure these higher rent charges were not due to the fact t
 ### Market Segmentation
 
 We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables, but we did make sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
-```{r, echo=TRUE}
+```{r, echo=FALSE}
 library(ggplot2)
 library(LICORS)  # for kmeans++
 library(foreach)
 library(mosaic)
 
 socialmarketing = read.csv('social_marketing.csv', header=TRUE)
-summary(socialmarketing)
 dim(socialmarketing)
 
 # Center and scale the data
-X = socialmarketing[,-(1:9)]
+X = socialmarketing[,-(1:1)]
 X = scale(X, center=TRUE, scale=TRUE)
-
+summary(X)
 # Extract the centers and scales from the rescaled data (which are named attributes)
 mu = attr(X,"scaled:center")
 sigma = attr(X,"scaled:scale")
@@ -317,7 +316,7 @@ sigma = attr(X,"scaled:scale")
 First we decided to make a plot of the sum of squares vs. the different choices of K to find the optimal K in which to use in our kmeans ++ model. Using the elbow method we found that 4-6 were the optimal numbers for K.
 ```{r, echo=TRUE}
 ### finding the optimal K###
-set.seed(1)
+set.seed(2)
 mydata <- X
 wss <- (nrow(mydata)-1)*sum(apply(mydata,2,var))
 for (i in 2:10) wss[i] <- sum(kmeans(mydata,
@@ -326,7 +325,7 @@ plot(1:10, wss, type="b", xlab="Number of Clusters",
      ylab="Within groups sum of squares")
 ```
 
-We ran a kmeans++ model using k=4, k=5, and k=6. Below you can see the outputs for each one. It turns out the using K=6 gave us too many clusters that didn't have very significant differences between them and that k=4 was not showing all the possible market segmentations, so for our final model we picked k=5.
+We ran a kmeans++ model using k=4, k=5, and k=6. Below you can see the outputs for each one. It turns out the using K=4 and K=5, did not give us enough clusters, and that when we used K=6 we could see distinct clusters that differed from one another.
 ```{r, echo=TRUE}
 
 ### optimal output from above shows wither 3 or 6 for k so lets try both
@@ -335,11 +334,11 @@ clust5 = kmeanspp(X, k=5, nstart=25)
 
 
 #cluster 3 centers
-clust5$center[1,]*sigma + mu
-clust5$center[2,]*sigma + mu
-clust5$center[3,]*sigma + mu
-clust5$center[4,]*sigma + mu
-clust5$center[5,]*sigma + mu
+clust5$center[1,]*sigma + mu #chatter, photo_sharing, not active
+clust5$center[2,]*sigma + mu #cooking, fashion, beauty, chatter, photo sharing
+clust5$center[3,]*sigma + mu #chatter, photo sharing, personal fitness, health nutrition
+clust5$center[4,]*sigma + mu #chatter, photo sharing, parenting, sports fandom, food, family
+clust5$center[5,]*sigma + mu #chatter, photo_sharing, news, politics, travel, 
 
 #checking to see sum of squares
 clust5$tot.withinss
@@ -350,10 +349,10 @@ options(scipen=999)
 set.seed(1)
 clust4 = kmeanspp(X, k=4, nstart=25)
 #cluster 4  centers
-clust4$center[1,]*sigma + mu
-clust4$center[2,]*sigma + mu
-clust4$center[3,]*sigma + mu
-clust4$center[4,]*sigma + mu
+clust4$center[1,]*sigma + mu # food, sports fandom, religion, parenting
+clust4$center[2,]*sigma + mu # not active
+clust4$center[3,]*sigma + mu #travel, politics, news
+clust4$center[4,]*sigma + mu #cooking, fashion, shopping, health_nutrition
 
 #checking to see sum of squares
 clust4$tot.withinss
@@ -361,43 +360,49 @@ clust4$betweenss
 
 set.seed(1)
 clust6 = kmeanspp(X, k=6, nstart=25)
-#cluster 4  centers
-clust6$center[1,]*sigma + mu
-clust6$center[2,]*sigma + mu
-clust6$center[3,]*sigma + mu
-clust6$center[4,]*sigma + mu
-clust6$center[5,]*sigma + mu
-clust6$center[6,]*sigma + mu
+#cluster 6  centers
+clust6$center[1,]*sigma + mu #chatter, photo sharing
+clust6$center[2,]*sigma + mu #online gaming, college universities
+clust6$center[3,]*sigma + mu #health nutrition, personal fitness
+clust6$center[4,]*sigma + mu # sports fandom, parenting, religion
+clust6$center[5,]*sigma + mu # politics, travel, news
+clust6$center[6,]*sigma + mu # fashion, cooking, beauty, photo sharing 
 
 
 #checking to see sum of squares
 clust6$tot.withinss
 clust6$betweenss
 ```
-Usin k=5, we found the following clusters to represent the following market segments:
+Usin k=6, we found the following clusters to represent the following market segments:
 
 1. Cluster 1
-- Focused around people who mentioned college universiteis, online gaming, and sports the most. We figure that this is proabably a customer segmentation of young males from the ages of 16-22.
+- Focused around those who just used a lot of chatter or photo sharing, and did not really focus on any specific topic when tweeting. They also did not seem to be using twitter a lot since their counts were low in every topic.
 
 2. Cluster 2
-- Focused around people who mentioned shopping, health nutrition, and news seldomly. We deemed this to possibly be young female adults, who use media sometimes, since their counts were low for these categories, but had even lower counts across the board.
+- Focused around people who mentioned online gaming or college universities a lot. We figures that this could be a young male population consisting of 16-22 year olds who are active on twitter.
 
 3. Cluster 3
-- Focused around people who talked a lot about cooking, fashion and beauty. We presume that this customer segment focuses on younger women aged 16-26 who uses social media a lot as their counts were pretty high for these areas.
+- Focused around people who talked a lot about health nutrition and personal fitness. This customer segment could possibly be young adults or adults who are very into fitness and staying healthy, and who regulary attend the gym and eat nutrious foods. 
 
 4. Cluster 4
-- Focused around those who mentioned food, family, parenting and religion a lot. This customer group seemed to be of an older age, and who had families with children. These would probably be adults aged 28-50.
+- Focused around sports fandom, parenting and religion. This customer segment more liekly than not represents the parents of families who have children, therefore consisting of an older adult crowd.
 
 5. Cluster 5
-- Focused around those who mentioned health nutrition and personal fitness a lot. We deemed this cluster to be a customer segment consisting of young adults or adults who are very into fitness and staying healthy. 
+- Focused around those who mentioned politics, travel, automotive, computers and news. This customer segment probably consits of older men who are educated and probably have more money.
 
-Below we plotted some of the key distinctions in every segment, so that you could see the different customer segments, for k=5. 
+6. Cluster 6
+- Focused on cooking, fashion, and beauty. This cusomter segment probably represents mothers or adult/young adult women.
+
+Below we plotted some of the key variables that represent every customer segment using K=6. 
 ```{r, echo=TRUE}
 # qplot is in the ggplot2 library
-qplot(college_uni, online_gaming,data=socialmarketing, size=I(3), color=factor(clust5$cluster))
-qplot(health_nutrition, news,data=socialmarketing, size=I(3), color=factor(clust5$cluster))
-qplot(beauty, fashion,data=socialmarketing, size=I(3), color=factor(clust5$cluster))
-qplot(family, food, data=socialmarketing, size=I(3), color=factor(clust5$cluster))
-qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3), color=factor(clust5$cluster))
+qplot(chatter, photo_sharing,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+qplot(online_gaming, college_uni,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+qplot(religion, sports_fandom, data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+qplot(news, politics,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+qplot(beauty, fashion,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+
+
 ```
 
