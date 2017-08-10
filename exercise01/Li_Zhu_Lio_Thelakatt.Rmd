@@ -2,7 +2,9 @@
 title: "Exercise 1"
 author: "Gaby Lio, Shirley Zhu, Jushira Thelakkat, Winnie Li"
 date: "August 10, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
  
@@ -132,7 +134,7 @@ This is becuase green buildings are a newer concept, and did not exist a while a
 
 Overall, there are too many confounding factors that effect the price of Rent. The guru solely basing his argument on the fact that green buildings have a higher rent is a wrong assumption, and therefore invalidates his analysis. 
 
-He also miscalculated the premium one could charge for having a green building. Holding all other variables constant, the premium is only .07, much smaller than what the guru proposed per square foot. This means that it would take way longer than 8 years to pay off the building. This calculation although erroneous, still does not matter though becuase the variable was insignficant when other variables were used in the analysis.
+He also miscalculated the premium one could charge for having a green building. Holding all other variables constant, the premium is only $0.07, much smaller than what the guru proposed per square foot. This means that it would take way longer than 8 years to pay off the building. This calculation although erroneous, still does not matter though becuase the variable was insignficant when other variables were used in the analysis.
 
 Taking all other variables into account, the rent price is higher due to many other variables, and not just the fact that the building is green. If we had more data, such as which location cluster the building would fall into, we may be able to predict if the rent of the building would be higher. Since we only know that it will be new and have 15 stories, there is not much more we can predict and the developer should not listen to the gurus anlaysis.  
 
