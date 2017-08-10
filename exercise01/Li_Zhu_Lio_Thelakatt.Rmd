@@ -26,9 +26,9 @@ knitr::opts_chunk$set(echo = TRUE)
 |N |0.15|0.2|0.35|
 |Total|0.3|0.7|1|
 
-P(Y|TC) = 0.5/0.7 = 71.4%
+P(Y|TC) = 0.5/0.7 = 71.43%
 
-The fraction of people who answered yes given that they are truthful clickers is 71.4%.
+The fraction of people who answered yes given that they are truthful clickers is 71.43%.
 
 **Part B: Suppose someone tests positive. What is the probability that they have the disease? In light of this calculation, do you envision any problems in implementing a universal testing policy for the disease?**
 
@@ -43,7 +43,7 @@ P(Dc) = 1-0.000025=0.999975
 
 |   |+|-|Total|
 |:--|--:|--:|--:|
-|D |2.49825e-05|0.00000018|0.000025|
+|D |2.49825e-05|0.00000018|0.0025|
 |Dc|1e-04|0.999875|0.999975|
 |Total|0.0001249825|0.999875|1|
 
@@ -58,9 +58,10 @@ P(+) = P(+,D)+P(+,Dc)=2.49825e-05+1e-04=0.0001249825
 
 P(D|+) =P(+,D)/P(+)=2.49825e-05/0.0001249825=0.199888 = **19.99%**
 
-The probability of that someone has the disease given that they test positive is very low, only 19.99%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.01% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
+The probability of that someone has the disease given that they test positive is very low, only 19.88%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.12% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
 
 ## Exploratory Analysis: Green Buildings
+
 First we need to clean up the data a little bit and make sure the categorical variables are changed to factors in R.
 ```{r, echo=TRUE}
 green_data = read.csv('greenbuildings.csv')
@@ -77,13 +78,13 @@ green_data$green_rating = as.factor(green_data$green_rating)
 ```
 
 
-First we plotted to see whether having a green rating on average could charge a higher rent for their building. The plot is below.
+First, we compared rent on Green Certified buildings vs. not Green Certified buildings to get a gauge of how much rent was going for each.
 ```{r, echo=TRUE}
 plot(green_data$green_rating, green_data$Rent, xlab='GREEN CERTIFIED', ylab='RENT', col='beige')
 
 ```
 
-We found that having a green rating slightly increased the amount of money you would be able to charge tenants for rent. We decided to plot LEED vs. RENT and ENERGYSTAR vs. RENT to see if there was a difference between being LEED or ENERGYSTAR certified vs. not being certified. The results are belw.
+We found that having a green rating slightly increased the amount of money you would be able to charge tenants for rent. We then decided to plot LEED vs. RENT and ENERGYSTAR vs. RENT to see if there was a difference between being LEED or ENERGYSTAR certified vs. not being certified.
 ```{r, echo=TRUE}
 # Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
 par(mfrow = c(1,2))
@@ -93,7 +94,7 @@ plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='R
 
 As you can see from the plots above, being LEED certified does not increase the amount you can charge your tenant for rent. The average is actually slightly lower than the average of those buildings who are not LEED certified. In contrast, being ENERGYSTAR certified is advantageous becuase you can charge tenants more for rent than if you were a building that was not ENERGYSTAR certified. 
 
-Nest we tried to see if gas costs were lower, being a green rating certified building.
+Next, we looked for gas cost trends in Green Certified buildings.
 ```{r,echo=TRUE}
 plot(green_data$green_rating, green_data$Gas_Costs, xlab='GREEN CERTIFIED', ylab='GAS COSTS', col='beige')
 
@@ -108,7 +109,7 @@ plot(green_data$LEED, green_data$Gas_Costs, xlab='LEED CERTIFED', ylab='GAS COST
 plot(green_data$Energystar, green_data$Gas_Costs, xlab='ENERGYSTAR CERTIFED', ylab='GAS COSTS', col='burlywood')
 ```
 
-From the plots above you can see that if you are ENERGYSTAR certified gas costs are the same as weather you are not and they are low. If you are LEEDS certified though, gas costs are actually higher, thus ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
+From the plots above you can see that if you are ENERGYSTAR certified, gas costs are the same as wif you are not certified, both sitting fairly low. However, if you are LEEDS certified, gas costs are actually higher, thus ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
 
 We followed the same procedure for electricity costs.
 ```{r,echo=TRUE}
@@ -116,7 +117,7 @@ plot(green_data$green_rating, green_data$Electricity_Costs, xlab='GREEN CERTIFIE
 
 ```
 
-We found that if you were a green certified building you had higher electric costs than a building that was not green certified. 
+We found that if you were a Green Certified building you had higher electricity costs than a building that was not Green Certified. 
 
 ```{r, echo=TRUE}
 #compare LEEDS vs. ENERGY STAR in ELECTRICITY COSTS
@@ -125,7 +126,7 @@ plot(green_data$LEED, green_data$Electricity_Costs, xlab='LEED CERTIFED', ylab='
 plot(green_data$Energystar, green_data$Electricity_Costs, xlab='ENERGYSTAR CERTIFED', ylab='ELECTRIC COSTS', col='burlywood')
 ```
 
-Electricity costs are definitely higher in the geographic regions for which ENERGYSTAR certified buildings are located. They are higher than buildings with no certification and also higher than buildings who are LEED certified. LEED certified buildings have lower electricity costs than buildings who are not LEED certified.
+Electricity costs are definitely higher in the geographic regions for which ENERGYSTAR certified buildings are located. They are higher than buildings with no certification and also higher than buildings who are LEED certified. LEED certified buildings have much lower electricity costs than buildings who are not LEED certified.
 
 ```{r, echo=TRUE}
 
@@ -294,7 +295,7 @@ Lastly, we had to make sure these higher rent charges were not due to the fact t
 
 ### Market Segmentation
 
-We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables except for the id, and we made sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
+We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables, but we did make sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
 ```{r, echo=FALSE}
 library(ggplot2)
 library(LICORS)  # for kmeans++
@@ -373,22 +374,22 @@ clust6$center[6,]*sigma + mu # fashion, cooking, beauty, photo sharing
 clust6$tot.withinss
 clust6$betweenss
 ```
-Using k=6, we found the following clusters to represent the following market segments:
+Usin k=6, we found the following clusters to represent the following market segments:
 
 1. Cluster 1
-- Focused around those who just used a lot of chatter or photo sharing on twitter, and did not really focus on any specific topic when tweeting. They also did not seem to be using twitter a lot since their counts were low in every topic.
+- Focused around those who just used a lot of chatter or photo sharing, and did not really focus on any specific topic when tweeting. They also did not seem to be using twitter a lot since their counts were low in every topic.
 
 2. Cluster 2
-- Focused around people who mentioned online gaming or college universities a lot. We figured that this could be a young male population consisting of aorund 16-22 year olds who are active on twitter.
+- Focused around people who mentioned online gaming or college universities a lot. We figures that this could be a young male population consisting of 16-22 year olds who are active on twitter.
 
 3. Cluster 3
 - Focused around people who talked a lot about health nutrition and personal fitness. This customer segment could possibly be young adults or adults who are very into fitness and staying healthy, and who regulary attend the gym and eat nutrious foods. 
 
 4. Cluster 4
-- Focused around sports fandom, parenting and religion. This customer segment probably represents the parents of families who have children, therefore consisting of an older adult crowd.
+- Focused around sports fandom, parenting and religion. This customer segment more liekly than not represents the parents of families who have children, therefore consisting of an older adult crowd.
 
 5. Cluster 5
-- Focused around those who mentioned politics, travel, automotive, computers and news. This customer segment probably consits of older men who are educated and are likely to have more money.
+- Focused around those who mentioned politics, travel, automotive, computers and news. This customer segment probably consits of older men who are educated and probably have more money.
 
 6. Cluster 6
 - Focused on cooking, fashion, and beauty. This cusomter segment probably represents mothers or adult/young adult women.
@@ -402,6 +403,7 @@ qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3), color
 qplot(religion, sports_fandom, data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(news, politics,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(beauty, fashion,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+
 
 ```
 
