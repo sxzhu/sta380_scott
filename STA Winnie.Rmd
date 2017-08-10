@@ -1,0 +1,200 @@
+---
+title: "STA_380_Homework_1"
+author: "Yuxin Li"
+date: "8/8/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Probability practice
+**Part A: What fraction of people who are truthful clickers answered yes?**
+
+* P(RC)=0.3
+*	P(TC)=0.7
+*	P(Y|RC)=0.5
+*	P(N|RC)=0.5
+*	P(Y)=0.65
+*	P(N)=0.35
+
+|   |RC|TC|Total|
+|:--|--:|--:|--:|
+|Y |0.15|0.5|0.65|
+|N |0.15|0.2|0.35|
+|Total|0.3|0.7|1|
+
+P(Y|TC) = 0.5/0.7 = 71.4%
+
+**Part B: Suppose someone tests positive. What is the probability that they have the disease? In light of this calculation, do you envision any problems in implementing a universal testing policy for the disease?**
+
+P(+|D)=0.9993
+
+P(-|Dc)=0.9999
+
+P(D) = 0.000025
+
+P(Dc) = 1-0.000025=0.999975
+
+
+|   |+|-|Total|
+|:--|--:|--:|--:|
+|D |2.49825e-05|0.00000018|0.0025|
+|Dc|1e-04|0.999875|0.999975|
+|Total|0.0001249825|0.999875|1|
+
+
+P(+,D) = P(+|D) * P(D) = 2.49825e-05
+
+P(-,Dc) =P(-|Dc)* P(Dc) = 0.999875
+
+P(+,Dc) = P(Dc) - P(-,Dc) = 0.999975-0.999875 = 1e-04
+
+P(+) = P(+,D)+P(+,Dc)=2.49825e-05+1e-04=0.0001249825
+
+P(D|+) =P(+,D)/P(+)=2.49825e-05/0.0001249825=0.199888 = **19.99%**
+
+## Exploratory analysis: green buildings
+
+Information on the P:
+
+*size: 250,000 
+*stories: 15-story
+```{r }
+green = read.csv('~/Documents/GitHub/STA380/data/greenbuildings.csv')
+green_scaled <- scale(green, center=TRUE, scale=TRUE) 
+plot(green_scaled[,'size'],green_scaled[,'Rent'])
+plot(green_scaled[,'cluster_rent'],green_scaled[,'Rent'])
+plot(green[,'stories'],green[,'Rent'],ylim = c(0,50))
+```
+
+
+## Bootstrapping
+```{r include=FALSE}
+#import the libraries
+library(mosaic)
+library(quantmod)
+library(foreach)
+```
+
+* Get data on the 5 ETFs starting from 2007-01-01
+
+```{r include=FALSE}
+#get data on 5 ETFs
+myETFs = c("SPY", "TLT", "LQD", "EEM", "VNQ")
+myprices = getSymbols(myETFs, from = "2007-01-01")
+for(ticker in myETFs) {
+	expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+	eval(parse(text=expr))
+}
+head(SPYa)
+```
+
+```{r}
+all_returns = cbind(	ClCl(SPYa),
+								ClCl(TLTa),
+								ClCl(LQDa),
+								ClCl(EEMa),
+								ClCl(VNQa))
+head(all_returns)
+all_returns = as.matrix(na.omit(all_returns))
+```
+Let's do a pairwise plot to observe the relationship between the five ETFs and identify which ones are closer related to other ETFs.
+```{r}
+pairs(all_returns)
+```
+
+We found out there are outliers in the datapoint,especially in the CICI data that are affecting the viewing ad interpretation of the graphs. Thus, we removed the extreme outliers
+```{r}
+#define a function to remove outliers
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+  qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
+  H <- 1.5 * IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- NA
+  y[x > (qnt[2] + H)] <- NA
+  y
+}
+```
+
+```{r}
+# Compute the returns from the closing prices
+n = seq(1,dim(all_returns)[2])
+all_clean_returns <- data.frame(0) 
+for (i in n){
+  y <- remove_outliers(all_returns[,i])
+  all_clean_returns = cbind(all_clean_returns,y)
+  names(all_clean_returns)[names(all_clean_returns) == 'y'] <- colnames(all_returns)[i]
+}
+all_clean_returns = as.matrix(na.omit(all_clean_returns[,2:6]))
+```
+Let's plot the cleaned dataset.
+```{r}
+pairs(all_clean_returns)
+```
+
+
+By looking at the pairs plot, we can estimate that SPY and TLT are negatively correlated; SPY and EEM, VNQ has a very positive correlation with each other. LQD has a positive correlation with TLT but not much with SPY,EEM or VNQ.
+
+Consider the correlation between SPY and EEM and VNQ, we will pick one out of the three with the least standard deviation(risk). Since SPY and TLT negatively correlated, we will keep both of them in a profile, thus, when one SPY goes down, TLT will go up to balance out the risk and vise versa. Since LQD has the lowest standard deviation, LQD will be included in the safe profile as well.
+
+
+Since the dropped-duplicates dataset is only for plotting purposes, and the outliers should be properly sampled in the future simulations, we will continue to work with the `all_returns` dataframe.
+
+##### The even split
+```{r}
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+
+initial_wealth = 100000
+
+sim1 = foreach(i=1:500, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.2, 0.2, 0.2, 0.2, 0.2)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = data.frame()
+  for(today in 1:n_days) {
+   	return.today = resample(all_returns, 1, orig.ids=FALSE)
+  	holdings = holdings + holdings*return.today
+  	total_wealth = sum(holdings)
+  	wealthtracker = rbind(wealthtracker,holdings)
+  	}
+  wealthtracker
+  }
+rownames(sim1) <- 1:nrow(sim1)
+sim1
+```
+
+```{r}
+library("abind")
+```
+
+```{r}
+d <- as.data.frame( matrix( 1:(0*0*0),1,1))
+sim1_sep = array(unlist(d), dim=c(20, 5, 0) ) 
+#mean_sim = as.data.frame( matrix( 1:(0*0*0),1,1))
+for (df in seq(1,100,n_days)){
+  sim1_sep <- abind(sim1_sep,sim1[df:(df+19),], along=3)
+  print(df)
+  print(sim1_sep)
+}
+sim1_sep
+```
+
+
+```{r}
+d <- as.data.frame( matrix( 1:(0*0*0),1,1))
+mean_sim = array( unlist(d), dim=c(0, 5, 0) ) 
+```
+
+```{r}
+plot(1,type='n',xlim=c(1,20),ylim=c(min(wealthtracker),max(wealthtracker)),xlab='Days', ylab='Wealth')
+foreach(i=1:5) %do% {
+lines(wealthtracker[,i], type='l',col=i)
+}
+legend('topleft',legend=c(colnames(wealthtracker)),
+       col=c(2,3,4,5,6), lty=1:2, cex=0.8)
+```
+By looking at the trend plot,
+
