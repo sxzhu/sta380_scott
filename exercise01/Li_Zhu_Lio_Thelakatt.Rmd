@@ -1,0 +1,403 @@
+---
+title: "Assignment 1 - Scott"
+author: "Gaby Lio"
+date: "August 8, 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+## Probability practice
+**Part A: What fraction of people who are truthful clickers answered yes?**
+
+* P(RC)=0.3
+*	P(TC)=0.7
+*	P(Y|RC)=0.5
+*	P(N|RC)=0.5
+*	P(Y)=0.65
+*	P(N)=0.35
+
+|   |RC|TC|Total|
+|:--|--:|--:|--:|
+|Y |0.15|0.5|0.65|
+|N |0.15|0.2|0.35|
+|Total|0.3|0.7|1|
+
+P(Y|TC) = 0.5/0.7 = 71.4%
+
+The fraction of people who answered yes given that they are truthful clickers is 71.43%.
+
+**Part B: Suppose someone tests positive. What is the probability that they have the disease? In light of this calculation, do you envision any problems in implementing a universal testing policy for the disease?**
+
+P(+|D)=0.9993
+
+P(-|Dc)=0.9999
+
+P(D) = 0.000025
+
+P(Dc) = 1-0.000025=0.999975
+
+
+|   |+|-|Total|
+|:--|--:|--:|--:|
+|D |2.49825e-05|0.00000018|0.0025|
+|Dc|1e-04|0.999875|0.999975|
+|Total|0.0001249825|0.999875|1|
+
+
+P(+,D) = P(+|D) * P(D) = 2.49825e-05
+
+P(-,Dc) =P(-|Dc)* P(Dc) = 0.999875
+
+P(+,Dc) = P(Dc) - P(-,Dc) = 0.999975-0.999875 = 1e-04
+
+P(+) = P(+,D)+P(+,Dc)=2.49825e-05+1e-04=0.0001249825
+
+P(D|+) =P(+,D)/P(+)=2.49825e-05/0.0001249825=0.199888 = **19.99%**
+
+The probability of that someone has the disease given that they test positive is very low, only 19.88%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.12% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
+
+## Exploratory Analysis: Green Buildings
+First we need to clean up the data a little bit and make sure the categorical variables are changed to factors in R.
+```{r, echo=TRUE}
+green_data = read.csv('greenbuildings.csv')
+
+green_data$renovated = as.factor(green_data$renovated)
+green_data$class_a = as.factor(green_data$class_a)
+green_data$class_b = as.factor(green_data$class_b)
+green_data$green_rating = as.factor(green_data$green_rating)
+green_data$LEED = as.factor(green_data$LEED)
+green_data$Energystar = as.factor(green_data$Energystar)
+green_data$net = as.factor(green_data$net)
+green_data$amenities = as.factor(green_data$amenities)
+green_data$green_rating = as.factor(green_data$green_rating)
+```
+
+
+First we plotted to see whether having a green rating on average could charge a higher rent for their building. The plot is below.
+```{r, echo=TRUE}
+plot(green_data$green_rating, green_data$Rent, xlab='GREEN CERTIFIED', ylab='RENT', col='beige')
+
+```
+
+We found that having a green rating slightly increased the amount of money you would be able to charge tenants for rent. We decided to plot LEED vs. RENT and ENERGYSTAR vs. RENT to see if there was a difference between being LEED or ENERGYSTAR certified vs. not being certified. The results are belw.
+```{r, echo=TRUE}
+# Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
+par(mfrow = c(1,2))
+plot(green_data$LEED, green_data$Rent, xlab='LEED CERTIFED', ylab='RENT', col='pink')
+plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='burlywood')
+```
+
+As you can see from the plots above, being LEED certified does not increase the amount you can charge your tenant for rent. The average is actually slightly lower than the average of those buildings who are not LEED certified. In contrast, being ENERGYSTAR certified is advantageous becuase you can charge tenants more for rent than if you were a building that was not ENERGYSTAR certified. 
+
+Nest we tried to see if gas costs were lower, being a green rating certified building.
+```{r,echo=TRUE}
+plot(green_data$green_rating, green_data$Gas_Costs, xlab='GREEN CERTIFIED', ylab='GAS COSTS', col='beige')
+
+```
+
+As you can see, gas costs for both green certified buildings and non green certified buildings were very low. We decided to look deeper and split the green certified again by LEED and ENERGYSTAR.
+
+```{r, echo=TRUE}
+#compare LEEDS vs. ENERGY STAR in Gas costs
+par(mfrow = c(1,2))
+plot(green_data$LEED, green_data$Gas_Costs, xlab='LEED CERTIFED', ylab='GAS COSTS', col='pink')
+plot(green_data$Energystar, green_data$Gas_Costs, xlab='ENERGYSTAR CERTIFED', ylab='GAS COSTS', col='burlywood')
+```
+
+From the plots above you can see that if you are ENERGYSTAR certified gas costs are the same as weather you are not and they are low. If you are LEEDS certified though, gas costs are actually higher, thus ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
+
+We followed the same procedure for electricity costs.
+```{r,echo=TRUE}
+plot(green_data$green_rating, green_data$Electricity_Costs, xlab='GREEN CERTIFIED', ylab='ELECTRIC COSTS', col='beige')
+
+```
+
+We found that if you were a green certified building you had higher electric costs than a building that was not green certified. 
+
+```{r, echo=TRUE}
+#compare LEEDS vs. ENERGY STAR in ELECTRICITY COSTS
+par(mfrow = c(1,2))
+plot(green_data$LEED, green_data$Electricity_Costs, xlab='LEED CERTIFED', ylab='ELECTRIC COSTS', col='pink')
+plot(green_data$Energystar, green_data$Electricity_Costs, xlab='ENERGYSTAR CERTIFED', ylab='ELECTRIC COSTS', col='burlywood')
+```
+
+Electricity costs are definitely higher in the geographic regions for which ENERGYSTAR certified buildings are located. They are higher than buildings with no certification and also higher than buildings who are LEED certified. LEED certified buildings have lower electricity costs than buildings who are not LEED certified.
+
+```{r, echo=TRUE}
+
+library(lattice)
+bwplot(green_data$Rent~green_data$LEED|green_data$class_a, ylab='RENT',  xlab='LEED vs. NOT LEED', main='Rent by Class A and LEED')
+```
+
+```{r, echo=TRUE}
+
+library(lattice)
+bwplot(green_data$Rent~green_data$Energystar|green_data$class_a, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class A and ENERGYSTAR')
+```
+
+
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$Rent~green_data$LEED|green_data$class_b, ylab='RENT',  xlab='LEED vs. NOT LEED', main='Rent by Class B and LEED')
+
+```
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$Rent~green_data$Energystar|green_data$class_b, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class B and ENERGYSTAR')
+
+```
+
+Whether you are a class a building or class b building and Leed certified vs. Energystar certified has really no effect on Rent prices. There is not much variability in the average amount of rent for these categories.
+
+
+It appears that buildings who have green ratings have less cool days than buildings who do not have green ratings. 
+```{r, echo=TRUE}
+plot(green_data$green_rating, green_data$cd_total_07, col='blue', xlab='GREEN RATING' , ylab='COOL DAYS')
+
+```
+
+To make sure that this hold true for each seperate green rating, we created box plots of cool days versus LEED and ENERGYSTAR ratings.
+
+```{r, echo=TRUE}
+
+par(mfrow = c(1,2))
+plot(green_data$Energystar, green_data$cd_total_07, xlab='ENERGYSTAR', ylab='COOLING DEGREE DAYS', col='blue')
+plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE DAYS', col='blue')
+
+```
+
+From the plots above you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy, and having lower demand. Energystar certified buildings also have less cooling days than buildings that are not energystar certified or not leed certified. LEED certified buildings have more cooling days than those who are not LEED certified. 
+
+We followed the same process for heating days.
+```{r, echo=TRUE}
+plot(green_data$green_rating, green_data$hd_total07 , col='red', xlab='GREEN RATING' , ylab='HEATING DAYS')
+
+```
+
+It appeared that buildings who had green ratings had fewer heating days on average.
+```{r, echo=TRUE}
+
+par(mfrow = c(1,2))
+plot(green_data$Energystar, green_data$hd_total07, xlab='ENERGYSTAR', ylab='HEATING DEGREE DAYS', col='red')
+plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE DAYS', col='red')
+
+```
+
+The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings hace a lot less heating days on average than LEED buildings. Energystar certified buildings also have less heating days than buildings that are not energystar certified or not leed certified. 
+
+```{r, echo=TRUE}
+plot(green_data$age, green_data$Rent, xlab='AGE', ylab='RENT')
+cor(green_data$size, green_data$Rent)
+```
+
+There is not really a linear relationship between age and rent of buildings like one would expect. We can try a lattice plot to see rent vs age grouped by energystar vs. not energystar and leed and not leed certified.
+```{r, echo=TRUE}
+xyplot(green_data$Rent~green_data$age|green_data$LEED, main='Rent Scatterplots by Age and LEED Certification', ylab='RENT', xlab='age')
+```
+```{r, echo=TRUE}
+xyplot(green_data$Rent~green_data$age|green_data$Energystar, main='Rent Scatterplots by Age and Energystar Certification', ylab='RENT', xlab='age')
+```
+
+There is no relationship between age and rent no matter which category a building falls into, be it LEED certified, ENERGYSTAR certified, or not certified. 
+
+We then tried to see how leasing rate was effected by green certified buildings. 
+```{r, echo=TRUE}
+
+plot(green_data$green_rating, green_data$leasing_rate, ylab='LEASING RATE', xlab='GREEN CERTIFIED', col='beige')
+```
+
+It appears that green certified buildings have higher leasing rates than those who are not green certifeid. We decided to dive deeper and break down green certified into the two respective categories. 
+
+```{r, echo=TRUE}
+par(mfrow=c(1,2))
+plot(green_data$LEED, green_data$leasing_rate, ylab='LEASING RATE', xlab='LEED CERTIFIED', col='pink')
+plot(green_data$Energystar, green_data$leasing_rate, ylab='LEASING RATE', xlab='ENERGYSTAR CERTIFIED', col='burlywood')
+```
+
+On average both LEED and Energystar buildings have a higher leasing rate than buildings who are not leed or energystar certified. 
+
+We also tried to see if green certified buildings had more stories than not green certified buildings.
+```{r, echo=TRUE}
+plot(green_data$green_rating, green_data$stories, xlab='GREEN CERTIFED', ylab='# of STORIES',col='beige')
+```
+
+It seems that there may be a a slight increase of number of stories in green certfied buildings.
+```{r, echo=TRUE}
+par(mfrow = c(1,2))
+plot(green_data$LEED, green_data$stories, xlab='LEED CERTIFED', ylab='# of STORIES', col='pink')
+plot(green_data$Energystar, green_data$stories, xlab='ENERGYSTAR CERTIFED', ylab='# of STORIES', col='burlywood')
+```
+
+It appears that the LEED certified and ENERGYSTAR certified buildings both have more stories than buildings without these certifcations, but only a slight number more.
+
+```{r, echo=TRUE}
+plot(green_data$green_rating, green_data$renovated, xlab='GREEN', ylab='RENOVATED')
+plot(green_data$LEED, green_data$renovated,xlab='LEED', ylab='RENOVATED')
+plot(green_data$Energystar, green_data$renovated, xlab='ENERGYSTAR', ylab='RENOVATED')
+
+```
+
+It appears that of the green buildings a smaller percent have been renovated in comparison to non green buildings. About 80% of green buildings have not been renovated, and only 20% have. This is in comparison to about 40% of non green buildings being renovated. Energy star buildings also get renovated only about 20% of the time, will LEED buildings get renovated about 30% of the time.
+
+
+We tried to see if rent was higher for those buildings that had amenities, and then factored in whether they were green certified or not.
+```{r, echo=TRUE}
+plot(green_data$amenities, green_data$Rent, xlab='AMENITIES', ylab='RENT', col='beige')
+```
+```{r, echo=TRUE}
+library(lattice)
+bwplot(green_data$amenities~ 
+         green_data$Rent|green_data$green_rating, xlab='AMENITIES', ylab='RENT', main='RENT by AMENITIES AND GREEN RATING')
+```
+
+Amenities do not seem to affect RENT. Lastly, we wanted to see if the variable net played a role in the higher rent prices. First we plotted net vs green certifeid to see if most green certified buildings have tenants pay for their utility costs, or if they are included in the quoted prices.
+
+```{r, echo=TRUE}
+plot(green_data$net, green_data$Energystar, xlab='ENERGYSTAR', ylab='NET')
+plot(green_data$net, green_data$LEED, xlab='LEED', ylab='NET')
+plot(green_data$net, green_data$green_rating, xlab='GREEN', ylab='NET')
+```
+
+We wanted to run these plots to make sure that the rent was not higher for Energystar/LEED/GREEN buildings becuase they make most of their tenants pay for utilities, in comparison to not green buildings. 
+
+```{r, echo=TRUE}
+plot(green_data$net, green_data$Rent, xlab='NET', ylab='RENT', col='beige')
+
+```
+
+From this plot you can see that those who pay their own utilities have a slightly lower rent, which is to be expected than those who do not pay their own utilities. We finished by making a lattice scatterplot of rent by net and green to see how rent is affected by these two variables. 
+
+```{r, echo=TRUE}
+bwplot(green_data$Rent~ green_data$net|green_data$green_rating, xlab='NET', ylab='RENT', main='BOXPLOT of RENT by NET and GREEN CERTIFIED')
+
+```
+
+These box plots show us that there is really not much variability in the rent whether you are green certified or not and whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is obvious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher in comparison to when you are, but only slightly. 
+
+
+#### Conclusion
+After looking over all of the plots, it is apparent that the Excel Guru on her staff had made a mistake. The Excel guru failed to split the green certified buildings into their particular certifications (LEEDS vs. ENERGYSTAR), when running his anlaysis. This was something we could do easily with plots. 
+
+When we do this you can see that only those buildings who are ENERGYSTAR certified can actually charge higher rent to tenants per square foot. The LEED certified buildings charge less per square foot in terms of rent. This type of pattern can be seen throughout the data. When looking at gas costs for example, buildings who were Energystar certified had lower gas costs than buildings who were LEED certified. The one contrast to this was the electricity costs, where having a Energystar certified building tended to have higher electricity costs than LEED certified buildings and even average buildings with no green certifications. The Class of the building seemed to have no affect on the costs of rent regardless of their certifcation. We also found that Age of the builiding, size of the building, and whether or no the building has amenties had no effect on the rent of the building. 
+
+We also found that heating and cooling days were much lower for energystar certified buildings, while leed certified buildings had higher counts of heating and cooling days.It was interesting to see that both LEED and ENERGYSTAR certified buildings had slighly higher leasing rates than buildings without green certifcations.
+
+So the excel guru was right in one aspect, if you make a green certified building, you will have a high occupancy rate no matter the certifcation as long as it is green. This means we would not have a problem finding tenants. The part he was wrong in though was that just being they were green certified they would yield a profit. According to the data it looks like if you must be Energystar certified to make these profits. Energystar has a low amount of cooling days and heating days in comparison to LEED certified buildings, whose average heating and cooling days are above the average of buildings who are not green certified. This means that Energystar buildings use less energy and have a lower demand. Energystar buildings can also charge a higher amount per square foot of rent than buildings without green certifcations, and definitely higher than those with LEED certifications. 
+
+Lastly, we had to make sure these higher rent charges were not due to the fact that Energystar buildings had utilites included in rent, and that is what was inflating the higher rent cost for tenants. We  examined the spineplots and found that utilities did seem to be included in the rent of energystar buildings about 90% of the time, but utlities was included in rent at an even higher percentage for non energystar buildings. Ultimately, this could not be the reason why the rent charges were inflagted if across the board this was the practice. The real estate developer should invest in beoming a green building only if they go for the Energystar certified option becuase of the cost savings, the rent upcharge, and the ability of the building to last longer without renovations. 
+
+### Bootstrapping
+
+### Market Segmentation
+
+We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables, but we did make sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
+```{r, echo=TRUE}
+library(ggplot2)
+library(LICORS)  # for kmeans++
+library(foreach)
+library(mosaic)
+
+socialmarketing = read.csv('social_marketing.csv', header=TRUE)
+summary(socialmarketing)
+dim(socialmarketing)
+
+# Center and scale the data
+X = socialmarketing[,-(1:9)]
+X = scale(X, center=TRUE, scale=TRUE)
+
+# Extract the centers and scales from the rescaled data (which are named attributes)
+mu = attr(X,"scaled:center")
+sigma = attr(X,"scaled:scale")
+```
+
+First we decided to make a plot of the sum of squares vs. the different choices of K to find the optimal K in which to use in our kmeans ++ model. Using the elbow method we found that 4-6 were the optimal numbers for K.
+```{r, echo=TRUE}
+### finding the optimal K###
+set.seed(1)
+mydata <- X
+wss <- (nrow(mydata)-1)*sum(apply(mydata,2,var))
+for (i in 2:10) wss[i] <- sum(kmeans(mydata,
+                                     centers=i)$withinss)
+plot(1:10, wss, type="b", xlab="Number of Clusters",
+     ylab="Within groups sum of squares")
+```
+
+We ran a kmeans++ model using k=4, k=5, and k=6. Below you can see the outputs for each one. It turns out the using K=6 gave us too many clusters that didn't have very significant differences between them and that k=4 was not showing all the possible market segmentations, so for our final model we picked k=5.
+```{r, echo=TRUE}
+
+### optimal output from above shows wither 3 or 6 for k so lets try both
+set.seed(1)
+clust5 = kmeanspp(X, k=5, nstart=25)
+
+
+#cluster 3 centers
+clust5$center[1,]*sigma + mu
+clust5$center[2,]*sigma + mu
+clust5$center[3,]*sigma + mu
+clust5$center[4,]*sigma + mu
+clust5$center[5,]*sigma + mu
+
+#checking to see sum of squares
+clust5$tot.withinss
+clust5$betweenss
+
+options(scipen=999)
+
+set.seed(1)
+clust4 = kmeanspp(X, k=4, nstart=25)
+#cluster 4  centers
+clust4$center[1,]*sigma + mu
+clust4$center[2,]*sigma + mu
+clust4$center[3,]*sigma + mu
+clust4$center[4,]*sigma + mu
+
+#checking to see sum of squares
+clust4$tot.withinss
+clust4$betweenss
+
+set.seed(1)
+clust6 = kmeanspp(X, k=6, nstart=25)
+#cluster 4  centers
+clust6$center[1,]*sigma + mu
+clust6$center[2,]*sigma + mu
+clust6$center[3,]*sigma + mu
+clust6$center[4,]*sigma + mu
+clust6$center[5,]*sigma + mu
+clust6$center[6,]*sigma + mu
+
+
+#checking to see sum of squares
+clust6$tot.withinss
+clust6$betweenss
+```
+Usin k=5, we found the following clusters to represent the following market segments:
+
+1. Cluster 1
+- Focused around people who mentioned college universiteis, online gaming, and sports the most. We figure that this is proabably a customer segmentation of young males from the ages of 16-22.
+
+2. Cluster 2
+- Focused around people who mentioned shopping, health nutrition, and news seldomly. We deemed this to possibly be young female adults, who use media sometimes, since their counts were low for these categories, but had even lower counts across the board.
+
+3. Cluster 3
+- Focused around people who talked a lot about cooking, fashion and beauty. We presume that this customer segment focuses on younger women aged 16-26 who uses social media a lot as their counts were pretty high for these areas.
+
+4. Cluster 4
+- Focused around those who mentioned food, family, parenting and religion a lot. This customer group seemed to be of an older age, and who had families with children. These would probably be adults aged 28-50.
+
+5. Cluster 5
+- Focused around those who mentioned health nutrition and personal fitness a lot. We deemed this cluster to be a customer segment consisting of young adults or adults who are very into fitness and staying healthy. 
+
+Below we plotted some of the key distinctions in every segment, so that you could see the different customer segments, for k=5. 
+```{r, echo=TRUE}
+# qplot is in the ggplot2 library
+qplot(college_uni, online_gaming,data=socialmarketing, size=I(3), color=factor(clust5$cluster))
+qplot(health_nutrition, news,data=socialmarketing, size=I(3), color=factor(clust5$cluster))
+qplot(beauty, fashion,data=socialmarketing, size=I(3), color=factor(clust5$cluster))
+qplot(family, food, data=socialmarketing, size=I(3), color=factor(clust5$cluster))
+qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3), color=factor(clust5$cluster))
+```
+
