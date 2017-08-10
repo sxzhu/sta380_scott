@@ -152,7 +152,7 @@ bwplot(green_data$Rent~green_data$Energystar|green_data$class_b, ylab='RENT',  x
 
 ```
 
-Whether you are a class a building or class b building and Leed certified vs. Energystar certified has really no effect on Rent prices. There is not much variability in the average amount of rent for these categories.
+Whether you are a Class A building or Class B building and LEED certified vs. ENERGYSTAR certified has really no effect on Rent prices. There is not much variability in the average amount of rent for these categories.
 
 
 It appears that buildings who have green ratings have less cool days than buildings who do not have green ratings. 
@@ -171,7 +171,7 @@ plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE 
 
 ```
 
-From the plots above you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy, and having lower demand. Energystar certified buildings also have less cooling days than buildings that are not energystar certified or not leed certified. LEED certified buildings have more cooling days than those who are not LEED certified. 
+From the plots above, you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy and having lower demand. ENERGYSTAR certified buildings also have less cooling days than buildings that are not ENERGYSTAR or LEED certified. LEED certified buildings have more cooling days than those who are not LEED certified. 
 
 We followed the same process for heating days.
 ```{r, echo=TRUE}
@@ -188,14 +188,14 @@ plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE D
 
 ```
 
-The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings hace a lot less heating days on average than LEED buildings. Energystar certified buildings also have less heating days than buildings that are not energystar certified or not leed certified. 
+The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings have a lot less heating days on average than LEED buildings. ENERGYSTAR certified buildings also have less heating days than buildings that are not ENERGYSTAR or LEED certified. 
 
 ```{r, echo=TRUE}
 plot(green_data$age, green_data$Rent, xlab='AGE', ylab='RENT')
 cor(green_data$size, green_data$Rent)
 ```
 
-There is not really a linear relationship between age and rent of buildings like one would expect. We can try a lattice plot to see rent vs age grouped by energystar vs. not energystar and leed and not leed certified.
+There is no prominent linear relationship between age and rent of buildings like one would expect. We can try a lattice plot to see rent vs. age grouped by ENERGYSTAR vs. not ENERGYSTAR and LEED vs. not LEED certified.
 ```{r, echo=TRUE}
 xyplot(green_data$Rent~green_data$age|green_data$LEED, main='Rent Scatterplots by Age and LEED Certification', ylab='RENT', xlab='age')
 ```
@@ -203,7 +203,7 @@ xyplot(green_data$Rent~green_data$age|green_data$LEED, main='Rent Scatterplots b
 xyplot(green_data$Rent~green_data$age|green_data$Energystar, main='Rent Scatterplots by Age and Energystar Certification', ylab='RENT', xlab='age')
 ```
 
-There is no relationship between age and rent no matter which category a building falls into, be it LEED certified, ENERGYSTAR certified, or not certified. 
+There is no discernible relationship between age and rent no matter which category a building falls into, be it LEED certified, ENERGYSTAR certified, or not certified. 
 
 We then tried to see how leasing rate was effected by green certified buildings. 
 ```{r, echo=TRUE}
@@ -211,7 +211,7 @@ We then tried to see how leasing rate was effected by green certified buildings.
 plot(green_data$green_rating, green_data$leasing_rate, ylab='LEASING RATE', xlab='GREEN CERTIFIED', col='beige')
 ```
 
-It appears that green certified buildings have higher leasing rates than those who are not green certifeid. We decided to dive deeper and break down green certified into the two respective categories. 
+It appears that green certified buildings have higher leasing rates than those who are not green certified. We decided to dive deeper and break down green certified into its two respective categories. 
 
 ```{r, echo=TRUE}
 par(mfrow=c(1,2))
@@ -219,7 +219,7 @@ plot(green_data$LEED, green_data$leasing_rate, ylab='LEASING RATE', xlab='LEED C
 plot(green_data$Energystar, green_data$leasing_rate, ylab='LEASING RATE', xlab='ENERGYSTAR CERTIFIED', col='burlywood')
 ```
 
-On average both LEED and Energystar buildings have a higher leasing rate than buildings who are not leed or energystar certified. 
+On average both LEED and ENERGYSTAR buildings have a higher leasing rate than buildings who are not LEED or ENERGYSTAR certified. 
 
 We also tried to see if green certified buildings had more stories than not green certified buildings.
 ```{r, echo=TRUE}
@@ -242,10 +242,10 @@ plot(green_data$Energystar, green_data$renovated, xlab='ENERGYSTAR', ylab='RENOV
 
 ```
 
-It appears that of the green buildings a smaller percent have been renovated in comparison to non green buildings. About 80% of green buildings have not been renovated, and only 20% have. This is in comparison to about 40% of non green buildings being renovated. Energy star buildings also get renovated only about 20% of the time, will LEED buildings get renovated about 30% of the time.
+It appears that of the green buildings a smaller percent have been renovated in comparison to non green buildings. About 80% of green buildings have not been renovated, and only 20% have. This is in comparison to about 40% of non green buildings being renovated. ENERGYSTAR buildings also get renovated only about 20% of the time, will LEED buildings get renovated about 30% of the time.
 
 
-We tried to see if rent was higher for those buildings that had amenities, and then factored in whether they were green certified or not.
+We tried to see if rent was higher for those buildings that had amenities and then factored in whether they were green certified or not.
 ```{r, echo=TRUE}
 plot(green_data$amenities, green_data$Rent, xlab='AMENITIES', ylab='RENT', col='beige')
 ```
@@ -255,7 +255,7 @@ bwplot(green_data$amenities~
          green_data$Rent|green_data$green_rating, xlab='AMENITIES', ylab='RENT', main='RENT by AMENITIES AND GREEN RATING')
 ```
 
-Amenities do not seem to affect RENT. Lastly, we wanted to see if the variable net played a role in the higher rent prices. First we plotted net vs green certifeid to see if most green certified buildings have tenants pay for their utility costs, or if they are included in the quoted prices.
+Amenities do not seem to affect rent. Lastly, we wanted to see if the variable 'net' played a role in the higher rent prices. First we plotted net vs. green certified to see if most green certified buildings have tenants pay for their utility costs or if they are included in the quoted prices.
 
 ```{r, echo=TRUE}
 plot(green_data$net, green_data$Energystar, xlab='ENERGYSTAR', ylab='NET')
@@ -263,7 +263,7 @@ plot(green_data$net, green_data$LEED, xlab='LEED', ylab='NET')
 plot(green_data$net, green_data$green_rating, xlab='GREEN', ylab='NET')
 ```
 
-We wanted to run these plots to make sure that the rent was not higher for Energystar/LEED/GREEN buildings becuase they make most of their tenants pay for utilities, in comparison to not green buildings. 
+We wanted to run these plots to make sure that the rent was not higher for ENERGYSTAR/LEED/GREEN buildings becuase they make most of their tenants pay for utilities, in comparison to not green buildings. 
 
 ```{r, echo=TRUE}
 plot(green_data$net, green_data$Rent, xlab='NET', ylab='RENT', col='beige')
@@ -277,25 +277,25 @@ bwplot(green_data$Rent~ green_data$net|green_data$green_rating, xlab='NET', ylab
 
 ```
 
-These box plots show us that there is really not much variability in the rent whether you are green certified or not and whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is obvious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher in comparison to when you are, but only slightly. 
+These box plots show us that there is really not much variability in the rent whether you are green certified or not or whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is obvious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher in comparison to when you are, but only slightly. 
 
 
 #### Conclusion
-After looking over all of the plots, it is apparent that the Excel Guru on her staff had made a mistake. The Excel guru failed to split the green certified buildings into their particular certifications (LEEDS vs. ENERGYSTAR), when running his anlaysis. This was something we could do easily with plots. 
+After looking over all of the plots, it is apparent that the Excel Guru on her staff had made a mistake. The Excel guru failed to split the green certified buildings into their two certifications (LEEDS vs. ENERGYSTAR) when running his anlaysis. This was something we could do easily with plots. 
 
-When we do this you can see that only those buildings who are ENERGYSTAR certified can actually charge higher rent to tenants per square foot. The LEED certified buildings charge less per square foot in terms of rent. This type of pattern can be seen throughout the data. When looking at gas costs for example, buildings who were Energystar certified had lower gas costs than buildings who were LEED certified. The one contrast to this was the electricity costs, where having a Energystar certified building tended to have higher electricity costs than LEED certified buildings and even average buildings with no green certifications. The Class of the building seemed to have no affect on the costs of rent regardless of their certifcation. We also found that Age of the builiding, size of the building, and whether or no the building has amenties had no effect on the rent of the building. 
+When we do this you can see that only those buildings who are ENERGYSTAR certified can actually charge higher rent to tenants per square foot. The LEED certified buildings actually charge less per square foot in terms of rent. When looking at gas costs, for example, buildings who were ENERGYSTAR certified had lower gas costs than buildings who were LEED certified. On the other hand, ENERGYSTAR certified building tended to have higher electricity costs than both LEED certified buildings and average buildings with no green certifications. The Class of the building seemed to have little to no affect on the costs of rent regardless of their certifcation. We also found that Age of the builiding, size of the building, and whether or not the building has amenties had no effect on the rent of the building. 
 
-We also found that heating and cooling days were much lower for energystar certified buildings, while leed certified buildings had higher counts of heating and cooling days.It was interesting to see that both LEED and ENERGYSTAR certified buildings had slighly higher leasing rates than buildings without green certifcations.
+We also found that heating and cooling days were much lower for ENERGYSTAR certified buildings compared to LEED certified buildings that had higher counts of heating and cooling days. It was interesting to see that both LEED and ENERGYSTAR certified buildings had slightly higher leasing rates than buildings without green certifcations.
 
-So the excel guru was right in one aspect, if you make a green certified building, you will have a high occupancy rate no matter the certifcation as long as it is green. This means we would not have a problem finding tenants. The part he was wrong in though was that just being they were green certified they would yield a profit. According to the data it looks like if you must be Energystar certified to make these profits. Energystar has a low amount of cooling days and heating days in comparison to LEED certified buildings, whose average heating and cooling days are above the average of buildings who are not green certified. This means that Energystar buildings use less energy and have a lower demand. Energystar buildings can also charge a higher amount per square foot of rent than buildings without green certifcations, and definitely higher than those with LEED certifications. 
+So the Excel guru was right in the regard that if you make a green certified building, you will have a high occupancy rate no matter the certifcation as long as it is green. This means we would not have a problem finding tenants. The part he was wrong about was that he concluded that being green certified alone would yield a profit. According to the data, a building must be ENERGYSTAR certified to make a desired profit. ENERGYSTAR has a low number of cooling heating days in comparison to LEED certified buildings, whose average heating and cooling days are above the average of buildings who are not green certified. This means that ENERGYSTAR buildings use less energy and have a lower demand. ENERGYSTAR buildings can also charge a higher amount per square foot of rent than buildings without green certifcations or with LEED certification. 
 
-Lastly, we had to make sure these higher rent charges were not due to the fact that Energystar buildings had utilites included in rent, and that is what was inflating the higher rent cost for tenants. We  examined the spineplots and found that utilities did seem to be included in the rent of energystar buildings about 90% of the time, but utlities was included in rent at an even higher percentage for non energystar buildings. Ultimately, this could not be the reason why the rent charges were inflagted if across the board this was the practice. The real estate developer should invest in beoming a green building only if they go for the Energystar certified option becuase of the cost savings, the rent upcharge, and the ability of the building to last longer without renovations. 
+Lastly, we had to make sure these higher rent charges were not due to the fact that Energystar buildings had utilites included in rent, and that is what was inflating the higher rent cost for tenants. We examined the spineplots and found that utilities did seem to be included in the rent of ENERGYSTAR buildings about 90% of the time, but utlities was included in rent at an even higher percentage for non ENERGYSTAR buildings. Ultimately, this could not be the reason why the rent charges were inflagted if across the board this was the practice. The real estate developer should invest in beoming a green building only if they go for the Energystar certified option becuase of the cost savings, the rent upcharge, and the ability of the building to last longer without renovations. 
 
 ### Bootstrapping
 
 ### Market Segmentation
 
-We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables, but we did make sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
+We decided to use clustering to see if we could find the different market segments for the company. As for the data pre-processing, we did not remove any variables but made sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
 ```{r, echo=FALSE}
 library(ggplot2)
 library(LICORS)  # for kmeans++
