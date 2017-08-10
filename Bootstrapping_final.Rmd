@@ -1,0 +1,265 @@
+---
+title: "Bootstrapping"
+output:
+  html_document: default
+  word_document: default
+---
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Bootstrapping
+
+
+
+```{r}
+library(mosaic)
+library(quantmod)
+library(foreach)
+```
+
+
+
+```{r}
+#Import the ETFs and use getSymboles to get their prices from 2007
+
+mystocks = c("SPY", "TLT", "LQD", "EEM", "VNQ")
+myprices = getSymbols(mystocks, from = "2007-01-01")
+for(ticker in mystocks) {
+	expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+	eval(parse(text=expr))
+}
+```
+
+
+
+```{r}
+# Combine all the returns into a single matrix
+
+all_returns = cbind(	ClCl(SPYa),
+								ClCl(TLTa),
+								ClCl(LQDa),
+								ClCl(EEMa),
+								ClCl(VNQa))
+head(all_returns)
+all_returns = as.matrix(na.omit(all_returns))
+```
+
+
+
+
+```{r}
+# The sample correlation matrix
+cor(all_returns)
+```
+
+
+
+```{r}
+boxplot(all_returns, main="Daily Return Distribution by Investment Type", names= c("SPYa","TLTa","LQDa","EEMa","VNQa"))
+```
+
+
+
+```{r}
+# Compute the returns from the closing prices
+pairs(all_returns)
+```
+
+
+The correlations suggest that LQD has almost zero correlations with all other assets except TLT. 
+
+Looking at the pairs plot of returns and the boxplots, the safest investments are Investment-grade corporate bonds (LQD), US Treasury bonds (TLT) and US domestic equities (QPY) . Their inter-quartile range (IQR, which captures the middle 50% of the data) is < +/-0.005. In looking at the pair plots, these assets also have relatively tight clusters, which corresponds to the lowest risk and deviation.
+
+The riskier investments are emerging market equities (EEM) and real estate (VNQ), with IQRs between ~+/- 0.01.There is a tradeoff between return and risk, with the higher risk investments yielding higher potential returns.
+
+
+```{r}
+
+# Get the standard deviations and Value at risk for each of the five ETFs for comparision
+
+VaR_all=NULL
+mean_all=NULL
+sd_all=NULL
+par(mfrow=c(3,2))
+n_days=20
+set.seed(1)
+for (j in 1:ncol(all_returns)){
+  # Now simulate many different possible years
+  sim = foreach(i=1:5000, .combine='rbind') %do% {
+    totalwealth = 100000
+    weights = 1
+    holdings = weights * totalwealth
+    wealthtracker = rep(0, n_days) # Set up a placeholder to track total wealth
+    for(today in 1:n_days) {
+      return.today = resample(all_returns[,j], 1, orig.ids=FALSE)
+      holdings = holdings + holdings*return.today
+      totalwealth = sum(holdings)
+      wealthtracker[today] = totalwealth
+    }
+    wealthtracker
+  }
+  
+  hist(sim[,n_days]- 100000, main = paste('Histogram for ',colnames(all_returns)[j],sep=" "), xlab = "Returns")
+  
+  # Calculate 5% value at risk
+  VaR_all[j] = quantile(sim[,n_days], 0.05) - 100000
+  mean_all[j] = mean(sim[,n_days])
+  sd_all[j] = sd(sim[,n_days])
+}
+```
+
+
+```{r}
+VaR_all
+
+mean_all
+
+sd_all
+```
+
+
+To further support our previous findings, we see that EEM and VNQ have very high standard deviations (standard deviation being a measure or risk) and value at risk values compared to LQD, TLT and SPY. So if an investor is looking for a high return, he/she should invest in these  ETFs which have the highest risk.
+
+We also see that LQD seems to be the ETF with the least value at risk and least standard deviation.
+So we will look to give this ETF a relatively higher weight in our safe portfolio.
+
+
+
+
+
+
+
+###Even Split Portfolio
+
+Here we give equal weights of 0.2 each to all the five ETFs.
+
+```{r}
+initialwealth=100000
+sim_even = foreach(i=1:5000, .combine='rbind') %do% {
+totalwealth_even = 100000
+n_days = 20
+weights_even = c(0.2, 0.2, 0.2, 0.2, 0.2)
+holdings_even = weights_even * totalwealth_even
+wealthtracker_even = rep(0, n_days) # Set up a placeholder to track total wealth
+
+for(today in 1:n_days) {
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+holdings_even = holdings_even + holdings_even*return.today
+totalwealth_even = sum(holdings_even)
+wealthtracker_even[today] = totalwealth_even
+}
+wealthtracker_even
+}
+
+hist(sim_even[,n_days]- 100000, main = "Histogram of returns - Even Split", xlab = "Returns")
+abline(v=mean(sim_even[,n_days]- 100000), col="red", lwd=2)
+```
+
+
+
+
+
+###Safer Portfolio
+
+For a safer choice than the even split above, we decided on only investing in the three safest invesements; US domestic markets, US Treasury bonds, and corporate bonds. This will minimize the chance of a big loss, but will also limit potential for large gains.
+Historically the bond market has been less vulnerable to price swings or volatility than the stock market.
+
+A safer stock would be the one which does not vary much due to changes in other stocks and has positive returns. In this case, LQD is one such stock with close to zero correlation with all other stocks except TLT. 
+
+Also, among LQD, TLT and SPY, LQD has the least standard deviation (least risk) so we give a higher weight of 0.5 to LQD and lesser weight of 0.2 to SPY.
+
+
+
+```{r}
+initialwealth=100000
+sim_safe = foreach(i=1:5000, .combine='rbind') %do% {
+totalwealth_safe = 100000
+n_days = 20
+weights_safe = c(0.2, 0.3, 0.5, 0, 0)
+holdings_safe = weights_safe * totalwealth_safe
+wealthtracker_safe = rep(0, n_days) # Set up a placeholder to track total wealth
+for(today in 1:n_days) {
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+holdings_safe = holdings_safe + holdings_safe*return.today
+totalwealth_safe = sum(holdings_safe)
+wealthtracker_safe[today] = totalwealth_safe
+}
+wealthtracker_safe
+}
+hist(sim_safe[,n_days]- 100000, main = "Histogram of returns - Safe", xlab = "Returns")
+abline(v=mean(sim_safe[,n_days]- 100000), col="red", lwd=2)
+```
+
+
+
+
+
+
+###Riskier Portfolio
+
+For the risky portfolio, we decided on investing an even split in the two riskiest investments from above; emerging market equities (EEM) and real estate (VNQ) . This will maximize the chance at a big return, but will also open the possibility for severe losses.
+
+
+
+```{r}
+initialwealth=100000
+sim_risk = foreach(i=1:5000, .combine='rbind') %do% {
+totalwealth_risk = 100000
+n_days = 20
+weights_risk = c(0, 0, 0, 0.5, 0.5)
+holdings_risk = weights_risk * totalwealth_risk
+wealthtracker_risk = rep(0, n_days) # Set up a placeholder to track total wealth
+for(today in 1:n_days) {
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+holdings_risk = holdings_risk + holdings_risk*return.today
+totalwealth_risk = sum(holdings_risk)
+wealthtracker_risk[today] = totalwealth_risk
+}
+wealthtracker_risk
+}
+hist(sim_risk[,n_days]- 100000, main = "Histogram of returns - Aggressive", xlab = "Returns")
+abline(v=mean(sim_risk[,n_days]- 100000), col="red", lwd=2)
+```
+
+
+
+
+
+```{r}
+names = c("Even","Safe","Aggresive")
+average = c(mean(sim_even[,20]), mean(sim_safe[,20]), mean(sim_risk[,20]))
+profit_prob = c(sum(sim_even[,20]>100000)/5000, sum(sim_safe[,20]>100000)/5000, sum(sim_risk[,20]>100000)/5000)
+VaR = c((quantile(sim_even[,n_days], 0.05) - 100000), (quantile(sim_safe[,n_days], 0.05) - 100000), (quantile(sim_risk[,n_days], 0.05) - 100000))
+
+data.frame(names, VaR)
+
+```
+
+
+
+The aggressive portfolio is definitely the riskiest with the highest absolute value at risk. The largest percentage of the portfolio value that one might lose over a given time period is 13000 dollars for a risky portfolio, to a 5% degree of certainty.
+
+The safe portfolio has the least absolute value at risk. The largest percentage of the portfolio value that one might lose over a given time period is just 2900 dollars for a safe portfolio, to a 5% degree of certainty.
+
+
+
+```{r}
+data.frame(names, average, profit_prob)
+```
+
+
+
+Average simulated values of the portfolios and the probability of making a profit can help make investment decisions.
+
+The aggressive portfolio which gave equal weights to the two riskiest ETFs has the highest average return (high risk-high return) but only 52% of portfolios would result in a profit. 
+
+The safe portfolio that gave maximum weight to LQD and lesser weights to TLT and SPY, has least average profit, but 61% of portfolios would result in a profit. 
+
+So the investor faces this risk-return tradeoff at the portfolio level while considering investment decisions.
+
+
+
+
+
+
