@@ -272,6 +272,7 @@ mean_all=NULL
 sd_all=NULL
 par(mfrow=c(3,2))
 n_days=20
+
 set.seed(1)
 for (j in 1:ncol(all_returns)){
   # Now simulate many different possible years
@@ -330,6 +331,7 @@ n_days = 20
 weights_even = c(0.2, 0.2, 0.2, 0.2, 0.2)
 holdings_even = weights_even * totalwealth_even
 wealthtracker_even = rep(0, n_days) # Set up a placeholder to track total wealth
+
 set.seed(1)
 for(today in 1:n_days) {
 return.today = resample(all_returns, 1, orig.ids=FALSE)
@@ -372,6 +374,7 @@ n_days = 20
 weights_safe = c(0.2, 0.3, 0.5, 0, 0)
 holdings_safe = weights_safe * totalwealth_safe
 wealthtracker_safe = rep(0, n_days) # Set up a placeholder to track total wealth
+
 set.seed(1)
 for(today in 1:n_days) {
 return.today = resample(all_returns, 1, orig.ids=FALSE)
@@ -405,6 +408,7 @@ n_days = 20
 weights_risk = c(0, 0, 0, 0.5, 0.5)
 holdings_risk = weights_risk * totalwealth_risk
 wealthtracker_risk = rep(0, n_days) # Set up a placeholder to track total wealth
+
 set.seed(1)
 for(today in 1:n_days) {
 return.today = resample(all_returns, 1, orig.ids=FALSE)
