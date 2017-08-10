@@ -1,0 +1,70 @@
+---
+title: "Exercises 1"
+output:
+  html_document: default
+  word_document: default
+---
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Probability Practice 
+
+##Part A 
+
+We know:
+
+* P(RC)=0.3
+
+* P(TC)=0.7
+
+* P(Y|RC)=0.5
+
+* P(N|RC)=0.5
+
+* P(Y)=0.65
+
+* P(N)=0.35
+
+We have to find P(Y|TC)=?
+
+P(Y)=P(Y|TC)P(TC)+P(Y|RC)P(RC)
+
+0.65=0.7x+0.5(0.3)
+
+0.5=0.7x
+
+P(Y|TC)=5/7
+
+**The fraction of truthful speakers who answered Yes is 5/7 or 71.4%**
+
+
+##Part B
+
+We have,
+
+* Sensitivity=P(T|D)=0.993
+
+* Specificity=P(T'|D')=0.9999
+
+P(D|T)= (P(T|D)P(D))/P(T)
+
+P(D)=0.000025
+
+P(T|D)P(D) = 0.993 * 0.000025
+           = 0.000024825
+
+P(T) = P(T|D)P(D)+P(T|D')P(D')
+     = 0.9930 * 000025 + (1-0.9999)(1-0.000025)
+     = 0.0001248
+
+So, P(D|T) = 0.000024825/0.0001248
+           = 0.1989  (~19.9%)
+
+**This shows that even if you test positive for a disease, you have a 19.89% chance of actually having the disease. This chance is so low that it seems like this is not an ideal test for this particular disease.**
+
+
+#Bootstrapping
+
+For an even split,
+
+mystocks = c("SPY", "TLT", "LQD", "EEM", "VNQ")
