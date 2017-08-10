@@ -43,7 +43,7 @@ P(Dc) = 1-0.000025=0.999975
 
 |   |+|-|Total|
 |:--|--:|--:|--:|
-|D |2.49825e-05|0.00000018|0.0025|
+|D |2.49825e-05|0.00000018|0.000025|
 |Dc|1e-04|0.999875|0.999975|
 |Total|0.0001249825|0.999875|1|
 
@@ -294,7 +294,7 @@ Lastly, we had to make sure these higher rent charges were not due to the fact t
 
 ### Market Segmentation
 
-We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables, but we did make sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
+We decided to use clustering to see if we could find the different market segments for the company. As for the data pre processing, we did not remove any variables except for the id, and we made sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
 ```{r, echo=FALSE}
 library(ggplot2)
 library(LICORS)  # for kmeans++
@@ -373,22 +373,22 @@ clust6$center[6,]*sigma + mu # fashion, cooking, beauty, photo sharing
 clust6$tot.withinss
 clust6$betweenss
 ```
-Usin k=6, we found the following clusters to represent the following market segments:
+Using k=6, we found the following clusters to represent the following market segments:
 
 1. Cluster 1
-- Focused around those who just used a lot of chatter or photo sharing, and did not really focus on any specific topic when tweeting. They also did not seem to be using twitter a lot since their counts were low in every topic.
+- Focused around those who just used a lot of chatter or photo sharing on twitter, and did not really focus on any specific topic when tweeting. They also did not seem to be using twitter a lot since their counts were low in every topic.
 
 2. Cluster 2
-- Focused around people who mentioned online gaming or college universities a lot. We figures that this could be a young male population consisting of 16-22 year olds who are active on twitter.
+- Focused around people who mentioned online gaming or college universities a lot. We figured that this could be a young male population consisting of aorund 16-22 year olds who are active on twitter.
 
 3. Cluster 3
 - Focused around people who talked a lot about health nutrition and personal fitness. This customer segment could possibly be young adults or adults who are very into fitness and staying healthy, and who regulary attend the gym and eat nutrious foods. 
 
 4. Cluster 4
-- Focused around sports fandom, parenting and religion. This customer segment more liekly than not represents the parents of families who have children, therefore consisting of an older adult crowd.
+- Focused around sports fandom, parenting and religion. This customer segment probably represents the parents of families who have children, therefore consisting of an older adult crowd.
 
 5. Cluster 5
-- Focused around those who mentioned politics, travel, automotive, computers and news. This customer segment probably consits of older men who are educated and probably have more money.
+- Focused around those who mentioned politics, travel, automotive, computers and news. This customer segment probably consits of older men who are educated and are likely to have more money.
 
 6. Cluster 6
 - Focused on cooking, fashion, and beauty. This cusomter segment probably represents mothers or adult/young adult women.
@@ -402,7 +402,6 @@ qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3), color
 qplot(religion, sports_fandom, data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(news, politics,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(beauty, fashion,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
-
 
 ```
 
