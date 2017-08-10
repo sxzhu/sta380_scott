@@ -1,7 +1,7 @@
 ---
-title: "Assignment 1 - Scott"
-author: "Gaby Lio"
-date: "August 8, 2017"
+title: "Exercise 1"
+author: "Gaby Lio, Shirley Zhu, Jushira Thelakkat, Winnie Li"
+date: "August 10, 2017"
 output: html_document
 ---
 
@@ -43,7 +43,7 @@ P(Dc) = 1-0.000025=0.999975
 
 |   |+|-|Total|
 |:--|--:|--:|--:|
-|D |2.49825e-05|0.00000018|0.0025|
+|D |2.49825e-05|0.00000018|0.000025|
 |Dc|1e-04|0.999875|0.999975|
 |Total|0.0001249825|0.999875|1|
 
@@ -58,11 +58,12 @@ P(+) = P(+,D)+P(+,Dc)=2.49825e-05+1e-04=0.0001249825
 
 P(D|+) =P(+,D)/P(+)=2.49825e-05/0.0001249825=0.199888 = **19.99%**
 
-The probability of that someone has the disease given that they test positive is very low, only 19.88%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.12% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
+The probability of that someone has the disease given that they test positive is very low, only 19.99%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.01% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
 
 ## Exploratory Analysis: Green Buildings
+Looking through the stat gurus summary about green buildings we realized it was flawed in many ways. The first thing he did wrong was deciding to remove buildings that had less than 10% occupancy from the dataset. In our anlaysis we decided to keep these buildings.
 
-First we need to clean up the data a little bit and make sure the categorical variables are changed to factors in R.
+We first wanted to check his claims that rent would be higher for a green building, therefore making a green building more profitable, and convincing his boss to build a green building. We created box plots of green building vs. Rent to assert these claims.
 ```{r, echo=TRUE}
 green_data = read.csv('greenbuildings.csv')
 
@@ -77,14 +78,12 @@ green_data$amenities = as.factor(green_data$amenities)
 green_data$green_rating = as.factor(green_data$green_rating)
 ```
 
-
-First, we compared rent on Green Certified buildings vs. not Green Certified buildings to get a gauge of how much rent was going for each.
 ```{r, echo=TRUE}
 plot(green_data$green_rating, green_data$Rent, xlab='GREEN CERTIFIED', ylab='RENT', col='beige')
 
 ```
 
-We found that having a green rating slightly increased the amount of money you would be able to charge tenants for rent. We then decided to plot LEED vs. RENT and ENERGYSTAR vs. RENT to see if there was a difference between being LEED or ENERGYSTAR certified vs. not being certified.
+We found that having a green rating only slightly increased the amount of money you would be able to charge tenants for rent. In fact there is barely any variability between the two averages as shown in the box plots above, making the difference not statistically significant. If you go a step further and compare LEED certified vs. not and Energystar certified vs. not you see that in fact LEED energy buildings which are green certified charge a lower rent.
 ```{r, echo=TRUE}
 # Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
 par(mfrow = c(1,2))
@@ -92,211 +91,59 @@ plot(green_data$LEED, green_data$Rent, xlab='LEED CERTIFED', ylab='RENT', col='p
 plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='burlywood')
 ```
 
-As you can see from the plots above, being LEED certified does not increase the amount you can charge your tenant for rent. The average is actually slightly lower than the average of those buildings who are not LEED certified. In contrast, being ENERGYSTAR certified is advantageous becuase you can charge tenants more for rent than if you were a building that was not ENERGYSTAR certified. 
-
-Next, we looked for gas cost trends in Green Certified buildings.
-```{r,echo=TRUE}
-plot(green_data$green_rating, green_data$Gas_Costs, xlab='GREEN CERTIFIED', ylab='GAS COSTS', col='beige')
-
-```
-
-As you can see, gas costs for both green certified buildings and non green certified buildings were very low. We decided to look deeper and split the green certified again by LEED and ENERGYSTAR.
-
+This already points in the direction of discrediting the gurus claim of a green building being able to charge tenants more for rent. Another major mistake the GURU did was that he only analyzed the data without looking at possible other confouding variables (i.e. age, stories, anemities, net, etc.). When just analyzing Rent vs. green or not green, you are not taking into account other effects variables have. We decided to run a linear regression to see, if holding all other variables constant, being a green building had a signficant impact on rent. 
 ```{r, echo=TRUE}
-#compare LEEDS vs. ENERGY STAR in Gas costs
-par(mfrow = c(1,2))
-plot(green_data$LEED, green_data$Gas_Costs, xlab='LEED CERTIFED', ylab='GAS COSTS', col='pink')
-plot(green_data$Energystar, green_data$Gas_Costs, xlab='ENERGYSTAR CERTIFED', ylab='GAS COSTS', col='burlywood')
+lmgreen = lm(green_data$Rent~., data=green_data)
+summary(lmgreen)
 ```
 
-From the plots above you can see that if you are ENERGYSTAR certified, gas costs are the same as wif you are not certified, both sitting fairly low. However, if you are LEEDS certified, gas costs are actually higher, thus ENERGYSTAR certified gas costs are lower than LEED certified gas costs.
+As you can see from the output, when holding all other variables constant, having a green_rating was not significant in affecting Rent at all. Neither was a building having Energystar or LEED certifications (i.e. being green buildings). Other things that had a significant impact on rent included which cluster they belonged in, and each buildings size, age, class, net,amenities, perciption costs, heating days, gas costs, and electricity costs.
 
-We followed the same procedure for electricity costs.
-```{r,echo=TRUE}
-plot(green_data$green_rating, green_data$Electricity_Costs, xlab='GREEN CERTIFIED', ylab='ELECTRIC COSTS', col='beige')
 
-```
-
-We found that if you were a Green Certified building you had higher electricity costs than a building that was not Green Certified. 
-
+We then dived deeper into these insights by seeing if green buildings tended to have amenities thus increasing the price of rent. 
 ```{r, echo=TRUE}
-#compare LEEDS vs. ENERGY STAR in ELECTRICITY COSTS
-par(mfrow = c(1,2))
-plot(green_data$LEED, green_data$Electricity_Costs, xlab='LEED CERTIFED', ylab='ELECTRIC COSTS', col='pink')
-plot(green_data$Energystar, green_data$Electricity_Costs, xlab='ENERGYSTAR CERTIFED', ylab='ELECTRIC COSTS', col='burlywood')
+plot(green_data$green_rating, green_data$amenities, xlab='GREEN RATING', ylab='AMENITIES')
 ```
 
-Electricity costs are definitely higher in the geographic regions for which ENERGYSTAR certified buildings are located. They are higher than buildings with no certification and also higher than buildings who are LEED certified. LEED certified buildings have much lower electricity costs than buildings who are not LEED certified.
+As you can see from the plot above, about 70% of green buildings have amentities which means this could be influencing the higher price of rent.
 
-```{r, echo=TRUE}
-
-library(lattice)
-bwplot(green_data$Rent~green_data$LEED|green_data$class_a, ylab='RENT',  xlab='LEED vs. NOT LEED', main='Rent by Class A and LEED')
-```
-
-```{r, echo=TRUE}
-
-library(lattice)
-bwplot(green_data$Rent~green_data$Energystar|green_data$class_a, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class A and ENERGYSTAR')
-```
-
-
-```{r, echo=TRUE}
-library(lattice)
-bwplot(green_data$Rent~green_data$LEED|green_data$class_b, ylab='RENT',  xlab='LEED vs. NOT LEED', main='Rent by Class B and LEED')
-
-```
-```{r, echo=TRUE}
-library(lattice)
-bwplot(green_data$Rent~green_data$Energystar|green_data$class_b, ylab='RENT',  xlab='ENERGYSTAR vs. NOT ENERGYSTAR', main='Rent by Class B and ENERGYSTAR')
-
-```
-
-Whether you are a Class A building or Class B building and LEED certified vs. ENERGYSTAR certified has really no effect on Rent prices. There is not much variability in the average amount of rent for these categories.
-
-
-It appears that buildings who have green ratings have less cool days than buildings who do not have green ratings. 
-```{r, echo=TRUE}
-plot(green_data$green_rating, green_data$cd_total_07, col='blue', xlab='GREEN RATING' , ylab='COOL DAYS')
-
-```
-
-To make sure that this hold true for each seperate green rating, we created box plots of cool days versus LEED and ENERGYSTAR ratings.
-
-```{r, echo=TRUE}
-
-par(mfrow = c(1,2))
-plot(green_data$Energystar, green_data$cd_total_07, xlab='ENERGYSTAR', ylab='COOLING DEGREE DAYS', col='blue')
-plot(green_data$LEED, green_data$cd_total_07, xlab='LEED', ylab='COOLING DEGREE DAYS', col='blue')
-
-```
-
-From the plots above, you can see that those buildings who are ENERGYSTAR certified have less cooling days than LEED certified buildings, therefore using less energy and having lower demand. ENERGYSTAR certified buildings also have less cooling days than buildings that are not ENERGYSTAR or LEED certified. LEED certified buildings have more cooling days than those who are not LEED certified. 
-
-We followed the same process for heating days.
-```{r, echo=TRUE}
-plot(green_data$green_rating, green_data$hd_total07 , col='red', xlab='GREEN RATING' , ylab='HEATING DAYS')
-
-```
-
-It appeared that buildings who had green ratings had fewer heating days on average.
-```{r, echo=TRUE}
-
-par(mfrow = c(1,2))
-plot(green_data$Energystar, green_data$hd_total07, xlab='ENERGYSTAR', ylab='HEATING DEGREE DAYS', col='red')
-plot(green_data$LEED, green_data$hd_total07, xlab='LEED', ylab='HEATING DEGREE DAYS', col='red')
-
-```
-
-The same trend can be found when looking at heating days on LEED vs. ENERGYSTAR certified buildings. ENERGYSTAR buildings have a lot less heating days on average than LEED buildings. ENERGYSTAR certified buildings also have less heating days than buildings that are not ENERGYSTAR or LEED certified. 
-
-```{r, echo=TRUE}
-plot(green_data$age, green_data$Rent, xlab='AGE', ylab='RENT')
-cor(green_data$size, green_data$Rent)
-```
-
-There is no prominent linear relationship between age and rent of buildings like one would expect. We can try a lattice plot to see rent vs. age grouped by ENERGYSTAR vs. not ENERGYSTAR and LEED vs. not LEED certified.
-```{r, echo=TRUE}
-xyplot(green_data$Rent~green_data$age|green_data$LEED, main='Rent Scatterplots by Age and LEED Certification', ylab='RENT', xlab='age')
-```
-```{r, echo=TRUE}
-xyplot(green_data$Rent~green_data$age|green_data$Energystar, main='Rent Scatterplots by Age and Energystar Certification', ylab='RENT', xlab='age')
-```
-
-There is no discernible relationship between age and rent no matter which category a building falls into, be it LEED certified, ENERGYSTAR certified, or not certified. 
-
-We then tried to see how leasing rate was effected by green certified buildings. 
-```{r, echo=TRUE}
-
-plot(green_data$green_rating, green_data$leasing_rate, ylab='LEASING RATE', xlab='GREEN CERTIFIED', col='beige')
-```
-
-It appears that green certified buildings have higher leasing rates than those who are not green certified. We decided to dive deeper and break down green certified into its two respective categories. 
+We ran the same type of analysis for the variables net, class a, and class b. You can see that most green buildings are class A (about 80%) and few are Class B (about 20%). This proves that the upcharge in price is likely due to the building being class A and not green. 
 
 ```{r, echo=TRUE}
 par(mfrow=c(1,2))
-plot(green_data$LEED, green_data$leasing_rate, ylab='LEASING RATE', xlab='LEED CERTIFIED', col='pink')
-plot(green_data$Energystar, green_data$leasing_rate, ylab='LEASING RATE', xlab='ENERGYSTAR CERTIFIED', col='burlywood')
+plot(green_data$green_rating, green_data$class_a, xlab='GREEN RATING', ylab='CLASS A')
+plot(green_data$green_rating, green_data$class_b, xlab='GREEN RATING', ylab='CLASS B')
 ```
 
-On average both LEED and ENERGYSTAR buildings have a higher leasing rate than buildings who are not LEED or ENERGYSTAR certified. 
 
-We also tried to see if green certified buildings had more stories than not green certified buildings.
+The same goes for the variable net. As you can see below, most green buildings do not have to pay for their own utilities, it is included in the rent costs. Thus adding another confunding variable to why Rent prices could be higher.
 ```{r, echo=TRUE}
-plot(green_data$green_rating, green_data$stories, xlab='GREEN CERTIFED', ylab='# of STORIES',col='beige')
+plot(green_data$green_rating, green_data$net, xlab='GREEN', ylab='NET')
 ```
 
-It seems that there may be a a slight increase of number of stories in green certfied buildings.
-```{r, echo=TRUE}
-par(mfrow = c(1,2))
-plot(green_data$LEED, green_data$stories, xlab='LEED CERTIFED', ylab='# of STORIES', col='pink')
-plot(green_data$Energystar, green_data$stories, xlab='ENERGYSTAR CERTIFED', ylab='# of STORIES', col='burlywood')
-```
-
-It appears that the LEED certified and ENERGYSTAR certified buildings both have more stories than buildings without these certifcations, but only a slight number more.
+Lastly, it is told to us in the problem that the building will be 15 stories and will be new. When looking at the relative age of green buildings, they are much lower than non-green buildings.
 
 ```{r, echo=TRUE}
-plot(green_data$green_rating, green_data$renovated, xlab='GREEN', ylab='RENOVATED')
-plot(green_data$LEED, green_data$renovated,xlab='LEED', ylab='RENOVATED')
-plot(green_data$Energystar, green_data$renovated, xlab='ENERGYSTAR', ylab='RENOVATED')
 
+plot(green_data$green_rating, green_data$age, xlab='GREEN RATING', ylab='AGE', col='beige')
 ```
 
-It appears that of the green buildings a smaller percent have been renovated in comparison to non green buildings. About 80% of green buildings have not been renovated, and only 20% have. This is in comparison to about 40% of non green buildings being renovated. ENERGYSTAR buildings also get renovated only about 20% of the time, will LEED buildings get renovated about 30% of the time.
+This is becuase green buildings are a newer concept, and did not exist a while ago. From the linear regression output we can see that Age is a significant variable, and if the building is newer, the rent will tend to be higher than if the building was old. Since most green buildings are newer than non-green buildings this could be another factor affecting the rent price.
+
+Overall, there are too many confounding factors that effect the price of Rent. The guru solely basing his argument on the fact that green buildings have a higher rent is a wrong assumption, and therefore invalidates his analysis. 
+
+He also miscalculated the premium one could charge for having a green building. Holding all other variables constant, the premium is only .07, much smaller than what the guru proposed per square foot. This means that it would take way longer than 8 years to pay off the building. This calculation although erroneous, still does not matter though becuase the variable was insignficant when other variables were used in the analysis.
+
+Taking all other variables into account, the rent price is higher due to many other variables, and not just the fact that the building is green. If we had more data, such as which location cluster the building would fall into, we may be able to predict if the rent of the building would be higher. Since we only know that it will be new and have 15 stories, there is not much more we can predict and the developer should not listen to the gurus anlaysis.  
 
 
-We tried to see if rent was higher for those buildings that had amenities and then factored in whether they were green certified or not.
-```{r, echo=TRUE}
-plot(green_data$amenities, green_data$Rent, xlab='AMENITIES', ylab='RENT', col='beige')
-```
-```{r, echo=TRUE}
-library(lattice)
-bwplot(green_data$amenities~ 
-         green_data$Rent|green_data$green_rating, xlab='AMENITIES', ylab='RENT', main='RENT by AMENITIES AND GREEN RATING')
-```
-
-Amenities do not seem to affect rent. Lastly, we wanted to see if the variable 'net' played a role in the higher rent prices. First we plotted net vs. green certified to see if most green certified buildings have tenants pay for their utility costs or if they are included in the quoted prices.
-
-```{r, echo=TRUE}
-plot(green_data$net, green_data$Energystar, xlab='ENERGYSTAR', ylab='NET')
-plot(green_data$net, green_data$LEED, xlab='LEED', ylab='NET')
-plot(green_data$net, green_data$green_rating, xlab='GREEN', ylab='NET')
-```
-
-We wanted to run these plots to make sure that the rent was not higher for ENERGYSTAR/LEED/GREEN buildings becuase they make most of their tenants pay for utilities, in comparison to not green buildings. 
-
-```{r, echo=TRUE}
-plot(green_data$net, green_data$Rent, xlab='NET', ylab='RENT', col='beige')
-
-```
-
-From this plot you can see that those who pay their own utilities have a slightly lower rent, which is to be expected than those who do not pay their own utilities. We finished by making a lattice scatterplot of rent by net and green to see how rent is affected by these two variables. 
-
-```{r, echo=TRUE}
-bwplot(green_data$Rent~ green_data$net|green_data$green_rating, xlab='NET', ylab='RENT', main='BOXPLOT of RENT by NET and GREEN CERTIFIED')
-
-```
-
-These box plots show us that there is really not much variability in the rent whether you are green certified or not or whether you pay for your own utilities or not. The average rent of each box plot is around the same. It is obvious in both green certified and not green certified buildings that when you are not paying your own utilities rent is a little bit higher in comparison to when you are, but only slightly. 
-
-
-#### Conclusion
-After looking over all of the plots, it is apparent that the Excel Guru on her staff had made a mistake. The Excel guru failed to split the green certified buildings into their two certifications (LEEDS vs. ENERGYSTAR) when running his anlaysis. This was something we could do easily with plots. 
-
-When we do this you can see that only those buildings who are ENERGYSTAR certified can actually charge higher rent to tenants per square foot. The LEED certified buildings actually charge less per square foot in terms of rent. When looking at gas costs, for example, buildings who were ENERGYSTAR certified had lower gas costs than buildings who were LEED certified. On the other hand, ENERGYSTAR certified building tended to have higher electricity costs than both LEED certified buildings and average buildings with no green certifications. The Class of the building seemed to have little to no affect on the costs of rent regardless of their certifcation. We also found that Age of the builiding, size of the building, and whether or not the building has amenties had no effect on the rent of the building. 
-
-We also found that heating and cooling days were much lower for ENERGYSTAR certified buildings compared to LEED certified buildings that had higher counts of heating and cooling days. It was interesting to see that both LEED and ENERGYSTAR certified buildings had slightly higher leasing rates than buildings without green certifcations.
-
-So the Excel guru was right in the regard that if you make a green certified building, you will have a high occupancy rate no matter the certifcation as long as it is green. This means we would not have a problem finding tenants. The part he was wrong about was that he concluded that being green certified alone would yield a profit. According to the data, a building must be ENERGYSTAR certified to make a desired profit. ENERGYSTAR has a low number of cooling heating days in comparison to LEED certified buildings, whose average heating and cooling days are above the average of buildings who are not green certified. This means that ENERGYSTAR buildings use less energy and have a lower demand. ENERGYSTAR buildings can also charge a higher amount per square foot of rent than buildings without green certifcations or with LEED certification. 
-
-Lastly, we had to make sure these higher rent charges were not due to the fact that Energystar buildings had utilites included in rent, and that is what was inflating the higher rent cost for tenants. We examined the spineplots and found that utilities did seem to be included in the rent of ENERGYSTAR buildings about 90% of the time, but utlities was included in rent at an even higher percentage for non ENERGYSTAR buildings. Ultimately, this could not be the reason why the rent charges were inflagted if across the board this was the practice. The real estate developer should invest in beoming a green building only if they go for the Energystar certified option becuase of the cost savings, the rent upcharge, and the ability of the building to last longer without renovations. 
 
 ### Bootstrapping
 
 ### Market Segmentation
 
 We decided to use clustering to see if we could find the different market segments for the company. As for the data pre-processing, we did not remove any variables but made sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
-```{r, echo=FALSE}
+```{r,message=FALSE }
 library(ggplot2)
 library(LICORS)  # for kmeans++
 library(foreach)
