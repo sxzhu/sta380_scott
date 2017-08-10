@@ -155,7 +155,7 @@ Taking all other variables into account, the rent price is higher due to many ot
 # Bootstrapping
 
 
-```{r}
+```{r, message=FALSE}
 library(mosaic)
 library(quantmod)
 library(foreach)
@@ -163,7 +163,7 @@ library(foreach)
 
 
 
-```{r}
+```{r, message=FALSE}
 #Import the ETFs and use getSymboles to get their prices from 2007
 
 mystocks = c("SPY", "TLT", "LQD", "EEM", "VNQ")
