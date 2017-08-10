@@ -12,7 +12,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
-## Probability practice
+
+# Probability practice
 **Part A: What fraction of people who are truthful clickers answered yes?**
 
 * P(RC)=0.3
@@ -62,10 +63,15 @@ P(D|+) =P(+,D)/P(+)=2.49825e-05/0.0001249825=0.199888 = **19.99%**
 
 The probability of that someone has the disease given that they test positive is very low, only 19.99%! If they were to implement a universal testing policy for this disease, most people who test positive will not have the disease ~ about 80.01% actually. This would cause chaos, and proves that a universal testing policy for this disease is not recommended.   
 
-## Exploratory Analysis: Green Buildings
+
+
+# Exploratory Analysis: Green Buildings
+
+
 Looking through the stat gurus summary about green buildings we realized it was flawed in many ways. The first thing he did wrong was deciding to remove buildings that had less than 10% occupancy from the dataset. In our anlaysis we decided to keep these buildings.
 
 We first wanted to check his claims that rent would be higher for a green building, therefore making a green building more profitable, and convincing his boss to build a green building. We created box plots of green building vs. Rent to assert these claims.
+
 ```{r, echo=TRUE}
 green_data = read.csv('greenbuildings.csv')
 
@@ -86,14 +92,17 @@ plot(green_data$green_rating, green_data$Rent, xlab='GREEN CERTIFIED', ylab='REN
 ```
 
 We found that having a green rating only slightly increased the amount of money you would be able to charge tenants for rent. In fact there is barely any variability between the two averages as shown in the box plots above, making the difference not statistically significant. If you go a step further and compare LEED certified vs. not and Energystar certified vs. not you see that in fact LEED energy buildings which are green certified charge a lower rent.
+
 ```{r, echo=TRUE}
 # Compare RENT values vs. being LEED or ENERGYSTAR CERTIFIED 
 par(mfrow = c(1,2))
 plot(green_data$LEED, green_data$Rent, xlab='LEED CERTIFED', ylab='RENT', col='pink')
-plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', col='burlywood')
+plot(green_data$Energystar, green_data$Rent, xlab='ENERGYSTAR CERTIFED', ylab='RENT', 
+     col='burlywood')
 ```
 
 This already points in the direction of discrediting the gurus claim of a green building being able to charge tenants more for rent. Another major mistake the GURU did was that he only analyzed the data without looking at possible other confouding variables (i.e. age, stories, anemities, net, etc.). When just analyzing Rent vs. green or not green, you are not taking into account other effects variables have. We decided to run a linear regression to see, if holding all other variables constant, being a green building had a signficant impact on rent. 
+
 ```{r, echo=TRUE}
 lmgreen = lm(green_data$Rent~., data=green_data)
 summary(lmgreen)
@@ -103,6 +112,7 @@ As you can see from the output, when holding all other variables constant, havin
 
 
 We then dived deeper into these insights by seeing if green buildings tended to have amenities thus increasing the price of rent. 
+
 ```{r, echo=TRUE}
 plot(green_data$green_rating, green_data$amenities, xlab='GREEN RATING', ylab='AMENITIES')
 ```
@@ -119,6 +129,7 @@ plot(green_data$green_rating, green_data$class_b, xlab='GREEN RATING', ylab='CLA
 
 
 The same goes for the variable net. As you can see below, most green buildings do not have to pay for their own utilities, it is included in the rent costs. Thus adding another confunding variable to why Rent prices could be higher.
+
 ```{r, echo=TRUE}
 plot(green_data$green_rating, green_data$net, xlab='GREEN', ylab='NET')
 ```
@@ -140,7 +151,10 @@ Taking all other variables into account, the rent price is higher due to many ot
 
 
 
-### Bootstrapping
+
+# Bootstrapping
+
+
 ```{r}
 library(mosaic)
 library(quantmod)
@@ -185,8 +199,10 @@ cor(all_returns)
 
 
 ```{r}
-boxplot(all_returns, main="Daily Return Distribution by Investment Type", names= c("SPYa","TLTa","LQDa","EEMa","VNQa"))
+boxplot(all_returns, main="Daily Return Distribution by Investment Type", 
+        names= c("SPYa","TLTa","LQDa","EEMa","VNQa"))
 ```
+
 
 Looking at the boxplots, the safest investments are Investment-grade corporate bonds (LQD), US Treasury bonds (TLT) and US domestic equities (QPY) . Their inter-quartile range (IQR, which captures the middle 50% of the data) is < +/-0.005.
 
@@ -198,7 +214,9 @@ The riskier investments are emerging market equities (EEM) and real estate (VNQ)
 pairs(all_returns)
 ```
 
+
 We found out there are outliers in the datapoint,especially in the CLCL data that are affecting the viewing ad interpretation of the graphs. Thus, we removed the extreme outliers.
+
 
 ```{r}
 #define a function to remove outliers
@@ -234,12 +252,14 @@ pairs(all_clean_returns)
 ```
 
 
+
 By looking at the pairs plot, we can estimate that SPY and TLT are negatively correlated; SPY and EEM, VNQ has a very positive correlation with each other. LQD has a positive correlation with TLT but not much with SPY,EEM or VNQ.
 
 Consider the correlation between SPY and EEM and VNQ, we will pick one out of the three with the least standard deviation(lowest risk). Since SPY and TLT negatively correlated, we will keep both of them in a safe profile, thus, when  SPY goes down, TLT will go up to balance out the risk and vise versa. Since LQD has the lowest standard deviation, LQD will be included in the safe profile as well.
 
 
 Since the dropped-duplicates dataset is only for plotting purposes, and the outliers should be properly sampled in the future simulations, we will continue to work with the `all_returns` dataframe.
+
 
 
 
@@ -269,7 +289,8 @@ for (j in 1:ncol(all_returns)){
     wealthtracker
   }
   
-  hist(sim[,n_days]- 100000, main = paste('Histogram for ',colnames(all_returns)[j],sep=" "), xlab = "Returns")
+  hist(sim[,n_days]- 100000, main = paste('Histogram for ',colnames(all_returns)[j],sep=" "), 
+       xlab = "Returns")
   
   # Calculate 5% value at risk
   VaR_all[j] = quantile(sim[,n_days], 0.05) - 100000
@@ -277,6 +298,7 @@ for (j in 1:ncol(all_returns)){
   sd_all[j] = sd(sim[,n_days])
 }
 ```
+
 
 
 ```{r}
@@ -292,9 +314,6 @@ To further support our previous findings, we see that EEM and VNQ have very high
 
 We also see that LQD seems to be the ETF with the least value at risk and least standard deviation.
 So we will look to give this ETF a relatively higher weight in our safe portfolio.
-
-
-
 
 
 
@@ -321,7 +340,8 @@ wealthtracker_even[today] = totalwealth_even
 wealthtracker_even
 }
 
-hist(sim_even[,n_days]- 100000, main = "Histogram of returns - Even Split", xlab = "Returns")
+hist(sim_even[,n_days]- 100000, main = "Histogram of returns - Even Split", 
+     xlab = "Returns")
 abline(v=mean(sim_even[,n_days]- 100000), col="red", lwd=2)
 ```
 
@@ -331,12 +351,16 @@ abline(v=mean(sim_even[,n_days]- 100000), col="red", lwd=2)
 
 ###Safer Portfolio
 
-For a safer choice than the even split above, we decided on only investing in the three safest invesements; US domestic markets, US Treasury bonds, and corporate bonds. This will minimize the chance of a big loss, but will also limit potential for large gains.
+For a safer choice than the even split above, we decided on only investing in the three safest invesements; US domestic markets, US Treasury bonds, and corporate bonds. This will minimize the 
+chance of a big loss, but will also limit potential for large gains.
 Historically the bond market has been less vulnerable to price swings or volatility than the stock market.
 
-A safer stock would be the one which does not vary much due to changes in other stocks and has positive returns. In this case, LQD is one such stock with close to zero correlation with all other stocks except TLT. 
+A safer stock would be the one which does not vary much due to changes in other stocks and 
+has positive returns. In this case, LQD is one such stock with close to zero correlation 
+with all other stocks except TLT. 
 
-Also, among LQD, TLT and SPY, LQD has the least standard deviation (least risk) so we give a higher weight of 0.5 to LQD and lesser weight of 0.2 to SPY.
+Also, among LQD, TLT and SPY, LQD has the least standard deviation (least risk) so we give a 
+higher weight of 0.5 to LQD and lesser weight of 0.2 to SPY.
 
 
 
@@ -356,7 +380,8 @@ wealthtracker_safe[today] = totalwealth_safe
 }
 wealthtracker_safe
 }
-hist(sim_safe[,n_days]- 100000, main = "Histogram of returns - Safe", xlab = "Returns")
+hist(sim_safe[,n_days]- 100000, main = "Histogram of returns - Safe", 
+     xlab = "Returns")
 abline(v=mean(sim_safe[,n_days]- 100000), col="red", lwd=2)
 ```
 
@@ -387,7 +412,8 @@ wealthtracker_risk[today] = totalwealth_risk
 }
 wealthtracker_risk
 }
-hist(sim_risk[,n_days]- 100000, main = "Histogram of returns - Aggressive", xlab = "Returns")
+hist(sim_risk[,n_days]- 100000, main = "Histogram of returns - Aggressive", 
+     xlab = "Returns")
 abline(v=mean(sim_risk[,n_days]- 100000), col="red", lwd=2)
 ```
 
@@ -398,8 +424,12 @@ abline(v=mean(sim_risk[,n_days]- 100000), col="red", lwd=2)
 ```{r}
 names = c("Even","Safe","Aggresive")
 average = c(mean(sim_even[,20]), mean(sim_safe[,20]), mean(sim_risk[,20]))
-profit_prob = c(sum(sim_even[,20]>100000)/5000, sum(sim_safe[,20]>100000)/5000, sum(sim_risk[,20]>100000)/5000)
-VaR = c((quantile(sim_even[,n_days], 0.05) - 100000), (quantile(sim_safe[,n_days], 0.05) - 100000), (quantile(sim_risk[,n_days], 0.05) - 100000))
+profit_prob = c(sum(sim_even[,20]>100000)/5000, 
+                sum(sim_safe[,20]>100000)/5000, 
+                sum(sim_risk[,20]>100000)/5000)
+VaR = c((quantile(sim_even[,n_days], 0.05) - 100000), 
+        (quantile(sim_safe[,n_days], 0.05) - 100000), 
+        (quantile(sim_risk[,n_days], 0.05) - 100000))
 
 data.frame(names, VaR)
 
@@ -407,9 +437,13 @@ data.frame(names, VaR)
 
 
 
-The aggressive portfolio is definitely the riskiest with the highest absolute value at risk. The largest percentage of the portfolio value that one might lose over a given time period is 13000 dollars for a risky portfolio, to a 5% degree of certainty.
+The aggressive portfolio is definitely the riskiest with the highest absolute value at risk. 
+The largest percentage of the portfolio value that one might lose over a given time period is 
+13000 dollars for a risky portfolio, to a 5% degree of certainty.
 
-The safe portfolio has the least absolute value at risk. The largest percentage of the portfolio value that one might lose over a given time period is just 2900 dollars for a safe portfolio, to a 5% degree of certainty.
+The safe portfolio has the least absolute value at risk. The largest percentage of the portfolio 
+value that one might lose over a given time period is just 2900 dollars for a safe portfolio, 
+to a 5% degree of certainty.
 
 
 
@@ -423,12 +457,19 @@ Average simulated values of the portfolios and the probability of making a profi
 
 The aggressive portfolio which gave equal weights to the two riskiest ETFs has the highest average return (high risk-high return) but only 52% of portfolios would result in a profit. 
 
-The safe portfolio that gave maximum weight to LQD and lesser weights to TLT and SPY, has least average profit, but 61% of portfolios would result in a profit. 
+The safe portfolio that gave maximum weight to LQD and lesser weights to TLT and SPY, has least 
+average profit, but 61% of portfolios would result in a profit. 
 
 So the investor faces this risk-return tradeoff at the portfolio level while considering investment decisions.
-### Market Segmentation
 
-We decided to use clustering to see if we could find the different market segments for the company. As for the data pre-processing, we did not remove any variables but made sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
+
+
+
+# Market Segmentation
+
+We decided to use clustering to see if we could find the different market segments for the company. 
+As for the data pre-processing, we did not remove any variables but made sure to center and scale the variables before we ran the K-means regression. We figured that K-means would be the simpliest way to identify different segments in the market through clustering.
+
 ```{r,message=FALSE }
 library(ggplot2)
 library(LICORS)  # for kmeans++
@@ -448,6 +489,7 @@ sigma = attr(X,"scaled:scale")
 ```
 
 First we decided to make a plot of the sum of squares vs. the different choices of K to find the optimal K in which to use in our kmeans ++ model. Using the elbow method we found that 4-6 were the optimal numbers for K.
+
 ```{r, echo=TRUE}
 ### finding the optimal K###
 set.seed(2)
@@ -460,6 +502,7 @@ plot(1:10, wss, type="b", xlab="Number of Clusters",
 ```
 
 We ran a kmeans++ model using k=4, k=5, and k=6. Below you can see the outputs for each one. It turns out the using K=4 and K=5, did not give us enough clusters, and that when we used K=6 we could see distinct clusters that differed from one another.
+
 ```{r, echo=TRUE}
 
 ### optimal output from above shows wither 3 or 6 for k so lets try both
@@ -507,7 +550,8 @@ clust6$center[6,]*sigma + mu # fashion, cooking, beauty, photo sharing
 clust6$tot.withinss
 clust6$betweenss
 ```
-Usin k=6, we found the following clusters to represent the following market segments:
+
+Using k=6, we found the following clusters to represent the following market segments:
 
 1. Cluster 1
 - Focused around those who just used a lot of chatter or photo sharing, and did not really focus on any specific topic when tweeting. They also did not seem to be using twitter a lot since their counts were low in every topic.
@@ -528,11 +572,13 @@ Usin k=6, we found the following clusters to represent the following market segm
 - Focused on cooking, fashion, and beauty. This cusomter segment probably represents mothers or adult/young adult women.
 
 Below we plotted some of the key variables that represent every customer segment using K=6. 
+
 ```{r, echo=TRUE}
 # qplot is in the ggplot2 library
 qplot(chatter, photo_sharing,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(online_gaming, college_uni,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
-qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3), color=factor(clust6$cluster))
+qplot(health_nutrition, personal_fitness, data=socialmarketing, size=I(3),
+      color=factor(clust6$cluster))
 qplot(religion, sports_fandom, data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(news, politics,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
 qplot(beauty, fashion,data=socialmarketing, size=I(3), color=factor(clust6$cluster))
