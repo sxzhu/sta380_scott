@@ -10,18 +10,57 @@ output:
 # Flights at ABIA
 "Your task is to create a figure, or set of related figures, that tell an interesting story about flights into and out of Austin. You can annotate the figure and briefly describe it, but strive to make it as stand-alone as possible. It shouldn't need many, many paragraphs to convey its meaning. Rather, the figure should speak for itself as far as possible. "
 
-For our first section of exploratory data analysis, we decided to focus on airlines to see if we could draw any insights about which Airlines were more reliable in terms of delays. We then wanted to see the average arrival and average departure delay times (in minutes) each airline had when flying into or out of Austin.
+For our first section of exploratory data analysis, we decided to focus on airlines to see if we could draw any insights about which Airlines were more reliable in terms of delays and cancellations. We then looked into average arrival and average departure delay times (in minutes) each airline had when flying into or out of Austin.
 ```{r, echo=TRUE}
 airlinedata = read.csv("ABIA.csv")
+#calculating percentage of flights cancelled for each airline
+
+dfcancel = data.frame(aggregate(airlinedata$Cancelled~ airlinedata$UniqueCarrier, 
+                                airlinedata ,sum))
+
+df = data.frame(aggregate(airlinedata$FlightNum~ airlinedata$UniqueCarrier, 
+                          airlinedata, length))
+
+finaldf = merge(dfcancel, df)
+finaldf = within(finaldf, percent <- airlinedata.Cancelled/airlinedata.FlightNum)
+finaldf = finaldf[order(finaldf$percent),]
+
+barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "% of Flights Cancelled",
+        main = "% of Flights Cancelled per Airline", las=2, space=.5, col='beige', 
+        names.arg=c("NW", "F9", "US",'WN', "XE", "UA", "DL","CO", "YV",
+                    "B6","OO", "EV", "OH", "9E", "AA", "MQ"))
+
+```
+
+
+```{r, echo=TRUE}
 
 arrivaldelays = airlinedata[which(airlinedata[,15]>0),]
 df3 = data.frame(aggregate(arrivaldelays$ArrDelay~ arrivaldelays$UniqueCarrier, 
                            arrivaldelays, mean))
 df4 = df3[order(df3$arrivaldelays.ArrDelay),]
+fix(df4)
 
 barplot(df4$arrivaldelays.ArrDelay, names = df4$arrivaldelays.UniqueCarrier,
         xlab = "Unique Carrier", ylab = "Avg. Arrival Delays (minutes)",
         main = "Avg. Arrival Delay times per Airline", las=2, space=.5, col='coral')
+
+#calculating percentage of flights delayed for each airline
+
+df33 = data.frame(aggregate(arrivaldelays$ArrDelay~ arrivaldelays$UniqueCarrier, 
+                           arrivaldelays, length))
+df = data.frame(aggregate(airlinedata$FlightNum~ airlinedata$UniqueCarrier, 
+                          airlinedata, length))
+
+finaldf = merge(df33, df, by.x="arrivaldelays.UniqueCarrier", by.y="airlinedata.UniqueCarrier")
+finaldf = within(finaldf, percent <- arrivaldelays.ArrDelay/airlinedata.FlightNum)
+finaldf = finaldf[order(finaldf$percent),]
+barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "% of Arrivals Delayed",
+        main = "% of Arrivals delayed per Airline", las=2, space=.5, col='coral')
+
+
 
 ```
 
@@ -38,6 +77,21 @@ barplot(df6$departdelays.DepDelay, names = df6$departdelays.UniqueCarrier,
         xlab = "Unique Carrier", ylab = "Avg. Departure Delays (minutes)",
         main = "Avg. Departure Delay times per Airline", las=2, space=.5,
         col='darkolivegreen3')
+
+#calculating percentage of flights delayed for each airline
+
+df55 = data.frame(aggregate(departdelays$DepDelay~ departdelays$UniqueCarrier, 
+                           departdelays, length))
+
+df = data.frame(aggregate(airlinedata$FlightNum~ airlinedata$UniqueCarrier, airlinedata, length))
+
+finaldf = merge(df55, df, by.x="departdelays.UniqueCarrier", by.y="airlinedata.UniqueCarrier")
+finaldf = within(finaldf, percent <- departdelays.DepDelay/airlinedata.FlightNum)
+finaldf = finaldf[order(finaldf$percent),]
+barplot(finaldf$percent, names = finaldf$departdelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "% of Depatures Delayed",
+        main = "% of Departures Delayed per Airline", las=2, space=.5, col='darkolivegreen3')
+
 
 ```
 
