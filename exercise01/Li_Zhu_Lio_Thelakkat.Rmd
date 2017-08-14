@@ -145,7 +145,7 @@ This is becuase green buildings are a newer concept, and did not exist a while a
 
 Overall, there are too many confounding factors that effect the price of Rent. The guru solely basing his argument on the fact that green buildings have a higher rent is a wrong assumption, and therefore invalidates his analysis. 
 
-He also miscalculated the premium one could charge for having a green building. Holding all other variables constant, the premium is only $0.07, much smaller than what the guru proposed per square foot. This means that it would take way longer than 8 years to pay off the building. This calculation although erroneous, still does not matter though becuase the variable was insignficant when other variables were used in the analysis.
+He also miscalculated the premium one could charge for having a green building. Holding all other variables constant, the premium is only $0.07, much smaller than what the guru proposed per square foot. This means that it would take way longer than 8 years to pay off the building. This calculation although erroneous, still does not matter though because the variable was insignficant when other variables were used in the analysis.
 
 Taking all other variables into account, the rent price is higher due to many other variables, and not just the fact that the building is green. If we had more data, such as which location cluster the building would fall into, we may be able to predict if the rent of the building would be higher. Since we only know that it will be new and have 15 stories, there is not much more we can predict and the developer should not listen to the gurus anlaysis.  
 
@@ -204,7 +204,7 @@ boxplot(all_returns, main="Daily Return Distribution by Investment Type",
 ```
 
 
-Looking at the boxplots, the safest investments are Investment-grade corporate bonds (LQD), US Treasury bonds (TLT) and US domestic equities (QPY) . Their inter-quartile range (IQR, which captures the middle 50% of the data) is < +/-0.005.
+Looking at the boxplots, the safest investments are Investment-grade corporate bonds (LQD), US Treasury bonds (TLT) and US domestic equities (SPY) . Their inter-quartile range (IQR, which captures the middle 50% of the data) is < +/-0.005.
 
 The riskier investments are emerging market equities (EEM) and real estate (VNQ), with IQRs between ~+/- 0.01.There is a tradeoff between return and risk, with the higher risk investments yielding higher potential returns.
 
@@ -325,6 +325,7 @@ Here we give equal weights of 0.2 each to all the five ETFs.
 
 ```{r}
 initialwealth=100000
+set.seed(1)
 sim_even = foreach(i=1:5000, .combine='rbind') %do% {
 totalwealth_even = 100000
 n_days = 20
@@ -332,7 +333,7 @@ weights_even = c(0.2, 0.2, 0.2, 0.2, 0.2)
 holdings_even = weights_even * totalwealth_even
 wealthtracker_even = rep(0, n_days) # Set up a placeholder to track total wealth
 
-set.seed(1)
+
 for(today in 1:n_days) {
 return.today = resample(all_returns, 1, orig.ids=FALSE)
 holdings_even = holdings_even + holdings_even*return.today
@@ -340,11 +341,12 @@ totalwealth_even = sum(holdings_even)
 wealthtracker_even[today] = totalwealth_even
 }
 wealthtracker_even
-}
 
+}
 hist(sim_even[,n_days]- 100000, main = "Histogram of returns - Even Split", 
      xlab = "Returns")
 abline(v=mean(sim_even[,n_days]- 100000), col="red", lwd=2)
+
 ```
 
 
@@ -368,6 +370,7 @@ higher weight of 0.5 to LQD and lesser weight of 0.2 to SPY.
 
 ```{r}
 initialwealth=100000
+set.seed(1)
 sim_safe = foreach(i=1:5000, .combine='rbind') %do% {
 totalwealth_safe = 100000
 n_days = 20
@@ -375,7 +378,7 @@ weights_safe = c(0.2, 0.3, 0.5, 0, 0)
 holdings_safe = weights_safe * totalwealth_safe
 wealthtracker_safe = rep(0, n_days) # Set up a placeholder to track total wealth
 
-set.seed(1)
+
 for(today in 1:n_days) {
 return.today = resample(all_returns, 1, orig.ids=FALSE)
 holdings_safe = holdings_safe + holdings_safe*return.today
@@ -402,6 +405,7 @@ For the risky portfolio, we decided on investing an even split in the two riskie
 
 ```{r}
 initialwealth=100000
+set.seed(1)
 sim_risk = foreach(i=1:5000, .combine='rbind') %do% {
 totalwealth_risk = 100000
 n_days = 20
@@ -409,7 +413,7 @@ weights_risk = c(0, 0, 0, 0.5, 0.5)
 holdings_risk = weights_risk * totalwealth_risk
 wealthtracker_risk = rep(0, n_days) # Set up a placeholder to track total wealth
 
-set.seed(1)
+
 for(today in 1:n_days) {
 return.today = resample(all_returns, 1, orig.ids=FALSE)
 holdings_risk = holdings_risk + holdings_risk*return.today
