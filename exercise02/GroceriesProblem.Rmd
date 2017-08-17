@@ -75,9 +75,9 @@ The plot shows that rules with high lift typically have slightly low support.
 
 We moved on to further iterations.
 
+#### Attempt 2 : 
 
 ```{r}
-# Second attempt
 grocrules2 <- apriori(groceries,parameter=list(support=.02, confidence=.4, maxlen=6))
 inspect(grocrules2)
 ```
