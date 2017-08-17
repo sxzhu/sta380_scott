@@ -1,0 +1,102 @@
+---
+title: "Groceries_Exercise3"
+author: "Jushira"
+date: "August 15, 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The groceries text file has a wide range of products including food products like whole milk, liver loaf and household goods like cleaner and detergent and other items. We apply market basket analysis here and use the Apriori algorithm to find patterns of user behaviour.
+
+We first read in the groceries text file by using read.transactions. 
+
+```{r}
+rm(list=ls())
+library(arules)
+library(reshape2)
+library(plyr)
+library(arulesViz)
+groceries = read.transactions(file = "groceries.txt", rm.duplicates = TRUE, format = "basket", sep = ',')
+```
+
+The read.transactions() reads a data file and creates a transactions object. 
+The rm.duplicates in the above equation removes the duplicates just like lapply(groceries_list, unique) does.
+
+
+```{r}
+dim(groceries)
+```
+
+The groceries data has 9835 rows where each row is an associated list of items in the transaction. 
+There are 169 unique grocery store items. 
+
+
+
+We next plot the top 20 items by frequency
+```{r}
+itemFrequencyPlot(groceries,topN=20,type = "absolute", col = 'blue', xlab = 'Item', main = 'Frequency of Item Purchases')
+```
+
+We see that whole milk, other vegetables and buns are some of the most likely to be purchased items based on various itemsets
+The frequencies of items will become more relevant when results for different iterations of the Apriori algorithm are generated.
+
+We now apply the Apriori algorithm which is basically a bottoms-up approach used to identify frequent items and extend them to larger and large item sets as long as those item sets appear sufficiently often in the database.
+
+We juggle with different values of the three main parameters , namely Support (indication of how frequently the itemset appears in the dataset), Confidence (indication of how often the rule has been found to be true) and Lift (ratio of the observed support to that expected if X and Y were independent)
+
+#### Attempt 1 : 
+
+```{r}
+grocrules1 <- apriori(groceries, parameter=list(support=.01, confidence=.5, maxlen=4))
+inspect(grocrules1)
+```
+
+
+Here, we have 15 rules .
+
+The right hand side of all rules is either whole milk or other vegetables, and the items on the left are different combinations of other items that increase the likelihood of finding either milk or veggies in the same transaction.{Citrus fruit,root vegetables} and {root vegetables,tropical fruit} are three times more likely because of their high lift values.
+
+
+
+```{r}
+inspect(subset(grocrules1,subset=lift > 3))
+inspect(subset(grocrules1, subset=confidence > 0.5))
+inspect(subset(grocrules1, subset = support > .01 & confidence > 0.3))
+
+rules = apriori(groceries, parameter = list(support=.01, confidence=.3, target='rules'))
+plot(rules)
+```
+
+The plot shows that rules with high lift typically have slightly low support.
+
+We moved on to further iterations.
+
+
+```{r}
+# Second attempt
+grocrules2 <- apriori(groceries,parameter=list(support=.02, confidence=.4, maxlen=6))
+inspect(grocrules2)
+```
+
+After trying different other combinations, we took support threshold as .02, so that only rules that are relevant to 2% of transactions or more are included. We took confidence as 0.4. Additionally, the maximum size was increased to 6 items, however this made no difference in practice as all rules containd two or less items.
+
+Here in rhs, we have predominantly whole milk and other vegetables, which are the frequently bought items. These are just showing us grocery patterns of users . Lift values have decreased from previous iterations.
+
+
+
+In conclusion,
+
+From a marketing perspective, iterations of the algorithm that allow for small cuts of data but require very strong associations produce the most actionable results. 
+
+Looking at the patterns of rules across all attempts, it is interesting to note that the strongest rules in every case were exclusively among food items. Other items such as garbage bags, cleaning products, etc. did not show up with much frequency. Anecdotally, it is likely that consumers simply buy these items when they run out, as opposed to on a weekly basis or in conjunction with other items, so their appearance is effectively random. 
+
+Many of the rules across all iterations were simply combinations of commonly-bought items. 
+
+If the grocery items have high support, confidence and lift values, then we can place them together in the grocery store. This is especially important where one item in a pair is very popular, and the other item is very high margin.
+
+The results can be used to drive targeted marketing campaigns. For each user, we pick a handful of products based on products they have bought to date which have both a high uplift and a high margin, and send them a e.g. personalized email or display ads etc.
+
