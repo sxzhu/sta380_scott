@@ -172,16 +172,31 @@ X_test_df$author = author_test
 rf.model = randomForest(author_train ~.,data=X_train_df,distribution = 'multinomial',ntree=500)
 # newdata=cbind(X_test_df,author_test)
 pred = predict(rf.model,newdat=X_test_df)
-rf.pred = data.frame(pred,X_test_df)
+rf.pred = data.frame(pred)
 rf.result = cbind(rf.pred,author_test)
 rf.result$correct = (rf.result[,1] == rf.result[,2])
 mean(rf.result[,3])
 ```
-The random forest model returns a much lower accuracy rate of 0.22%, which means it almost can never predict correctly.
+The random forest model returns a better accuracy rate than naive bayes classifier with a tree number of 500.
+
+```{r}
+rf.False = rf.result[rf.result[,3]==FALSE,]
+rf.False <- table(rf.False[,2])
+
+print('Frequent mistakes:')
+print(sort(rf.False,decreasing = TRUE)/50)
+```
+
+The most frequent mistake that Random Forest classifier makes is the author, Scott Hillis with a percentage of 94%.
 
 
 
 #########SOME OHTER CODE IM TRYING WITH NNET############
+
+
+        Don't add to the final file.
+
+#########################################################
 ```{r}
 library(nnet)
 x_train = cbind.data.frame(X_train_df,author_train)
