@@ -117,7 +117,6 @@ nB.pred = data.frame(predict(nB.model,X_test_df))
 nB.result = cbind(nB.pred,author_test)
 nB.result$correct = (nB.result[,1] == nB.result[,2])
 mean(nB.result[,3])
-#sum(result[,3])/length(author_test)
 ```
 The Naive Bayes function gives us a out-of-sample accuracy of 44.16%. This means that about 44% of the time the naive bayes classfier will be able to attribute the articles to the correct author.
 ```{r}
@@ -133,22 +132,74 @@ As we can tell from the table above, each of these authors have 50 articles incl
 
 Let's try a different model to compare the result.
 
-```{r message=FALSE}
-#Logistic Regression
-library(nnet)
-gbm.model = gbm(author_train~.,data=X_train_df,distribution='multinomial',cv.fold2)
-gbm.pred = data.frame(predict(gbm.model,X_test_df))
-gbm.result = cbind(gbm.pred,author_test)
-gbm.result$correct = (gbm.result[,1] == gbm.result[,2])
-mean(gbm.result[,3])
-```
+
 ```{r}
 require(gbm)
 library(dplyr)
-gbm.model = gbm.fit(x=X_train_df,y=author_train,distribution = 'multinomial',n.tree= 50)
-
+gbm.model = gbm.fit(x=X_train_df,y=author_train,distribution = 'multinomial')
+gbm.pred = data.frame(predict(gbm.model,X_test_df,n.tree=100,distribution = 'multinomial'))
 ```
-```{r}
 
+```{r}
+names(gbm.pred)=unique(authorname)
+result=NULL
+for (i in seq(1,dim(gbm.pred)[1])){
+  best = names(sort(t(gbm.pred)[1:50,i])[50])[1]
+  result = append(result,best)
+}
+result <-data_frame(result)
+gbm.result = cbind(result,author_test)
+gbm.result$correct = (gbm.result[,1] == gbm.result[,2])
+mean(gbm.result[,3])
+```
+Gradient Boosting method with 100 tree is very unsuccessful, with a success rate of 2.24%, much worse than naive bayes model. Let's try multinomial logistic regression instead.
+
+
+#####RANDOM FOREST#######
+```{r}
+library(randomForest)
+#prepare data for random forest
+share = intersect(names(X_train_df),names(X_test_df))
+X_train_df <- X_train_df[,share]
+X_test_df <- X_test_df[,share]
+
+#take care of invalid type for variable next
+names(X_train_df) = paste(names(X_train_df),'0',sep='')
+names(X_test_df) = paste(names(X_test_df),'0',sep='')
+X_train_df$author = author_train
+X_test_df$author = author_test
+
+rf.model = randomForest(author_train ~.,data=X_train_df,distribution = 'multinomial',ntree=500)
+# newdata=cbind(X_test_df,author_test)
+pred = predict(rf.model,newdat=X_test_df)
+rf.pred = data.frame(pred,X_test_df)
+rf.result = cbind(rf.pred,author_test)
+rf.result$correct = (rf.result[,1] == rf.result[,2])
+mean(rf.result[,3])
+```
+The random forest model returns a much lower accuracy rate of 0.22%, which means it almost can never predict correctly.
+
+
+
+#########SOME OHTER CODE IM TRYING WITH NNET############
+```{r}
+library(nnet)
+x_train = cbind.data.frame(X_train_df,author_train)
+reg=neuralnet(X_train)
+reg.pred = predict(reg,as.matrix(DTM_all_doc_test),family = 'multinomial')
+df = as.data.frame(reg.pred)
+
+
+dim(df)
+
+result=NULL
+for (i in seq(1,dim(reg.pred)[1])){
+  best = names(sort(t(gbm.pred)[1:50,i])[50])[1]
+  result = append(result,best)
+}
+result <-data_frame(result)
+gbm.result = cbind(result,author_test)
+gbm.result$correct = (gbm.result[,1] == gbm.result[,2])
+mean(gbm.result[,3])
 ```
 
