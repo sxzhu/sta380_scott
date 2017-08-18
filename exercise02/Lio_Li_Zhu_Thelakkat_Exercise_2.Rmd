@@ -170,6 +170,169 @@ plot(dfmhours$delays.DepTime, dfmhours$delays.DepDelay,
 Lastly, it seems like the most delays happen in the middle of the day between 05:00 and 20:00. In contrast, barely any delays occur betwen 0:00 and 5:00, but when they do, they are very long. 
 
 
+# Author attribution
+
+```{r message=FALSE}
+rm(list=ls())
+library(tm) 
+library(magrittr)
+```
+
+
+First, we need to prepare for the training data, by reading from the train folder.
+
+
+```{r}
+readerPlain = function(fname){
+				readPlain(elem=list(content=readLines(fname)), 
+							id=fname, language='en') }
+							
+## get a list of author directories
+author_dirs = Sys.glob('data/ReutersC50/C50train/*')
+
+file_list = NULL
+#loop through all the documents for each authors
+for(author in author_dirs) {
+	author_name = substring(author, first=21)
+	files_to_add = Sys.glob(paste0(author, '/*.txt'))
+	file_list = append(file_list, files_to_add)
+}
+all_docs = lapply(file_list, readerPlain) 
+
+#name all the documents
+mynames = file_list %>%
+	{ strsplit(., '/', fixed=TRUE) } %>%
+	{ lapply(., tail, n=2) } %>%
+	{ lapply(., paste0, collapse = '') } %>%
+	unlist
+authorname = file_list %>%
+	{ strsplit(., '/', fixed=TRUE) } %>%
+	{ lapply(.,extract,4)} %>%
+	unlist
+names(all_docs)= mynames
+my_documents = Corpus(VectorSource(all_docs))
+
+#preprocess/tokenize the corpus
+my_documents = tm_map(my_documents, content_transformer(tolower)) # make everything lowercase
+my_documents = tm_map(my_documents, content_transformer(removeNumbers)) # remove numbers
+my_documents = tm_map(my_documents, content_transformer(removePunctuation)) # remove punctuation
+my_documents = tm_map(my_documents, content_transformer(stripWhitespace)) ## remove excess white-space
+my_documents = tm_map(my_documents, content_transformer(removeWords), stopwords("en")) ##remove stopwords
+
+## create a doc-term-matrix
+DTM_all_doc = DocumentTermMatrix(my_documents,control = list(weighting = weightTfIdf))
+# inspect(DTM_all_doc[1:10,1:20])
+DTM_all_doc = removeSparseTerms(DTM_all_doc, 0.95)
+
+X_train_df = as.data.frame(as.matrix(DTM_all_doc))
+author_train = factor(authorname)
+```
+
+Then, let's repeat the same step for testing data.
+
+```{r}
+#read in test data
+
+## get a list of author directories
+author_dirs_test = Sys.glob('data/ReutersC50/C50test/*')
+
+file_list_test = NULL
+
+#loop through all the documents for each authors
+for(author in author_dirs_test) {
+	author_name = substring(author, first=21)
+	files_to_add = Sys.glob(paste0(author, '/*.txt'))
+	file_list_test = append(file_list_test, files_to_add)
+}
+all_docs_test = lapply(file_list_test, readerPlain) 
+
+#name all the documents
+mynames_test = file_list_test %>%
+	{ strsplit(., '/', fixed=TRUE) } %>%
+	{ lapply(., tail, n=2) } %>%
+	{ lapply(., paste0, collapse = '') } %>%
+	unlist
+authorname_test = file_list_test %>%
+	{ strsplit(., '/', fixed=TRUE) } %>%
+	{ lapply(.,extract,4)} %>%
+	unlist
+names(all_docs_test)= mynames_test
+my_documents_test = Corpus(VectorSource(all_docs_test))
+#preprocess/tokenize the corpus
+my_documents_test = tm_map(my_documents_test, content_transformer(tolower)) # make everything lowercase
+my_documents_test = tm_map(my_documents_test, content_transformer(removeNumbers)) # remove numbers
+my_documents_test = tm_map(my_documents_test, content_transformer(removePunctuation)) # remove punctuation
+my_documents_test = tm_map(my_documents_test, content_transformer(removeWords), stopwords("en")) ##remove stopwords
+my_documents_test = tm_map(my_documents_test, content_transformer(stripWhitespace)) ## remove excess white-space
+## create a doc-term-matrix
+DTM_all_doc_test = DocumentTermMatrix(my_documents_test,control = list(weighting = weightTfIdf))
+# Remove sparse terms
+DTM_all_doc_test = removeSparseTerms(DTM_all_doc_test, 0.95)
+#put testing data in dataframe form
+X_test_df = as.data.frame(as.matrix(DTM_all_doc_test))
+author_test = factor(authorname_test)
+```
+
+After preparing the data, we would like to fit a naivebayes model and a logistic model to the data. We would use the naivebayes library to fit the first model. Then, we will compare the percentage of correctness of the two models.
+
+```{r}
+#Naive Bayes
+library(naivebayes)
+nB.model = naive_bayes(author_train~.,data=X_train_df)
+nB.pred = data.frame(predict(nB.model,X_test_df))
+nB.result = cbind(nB.pred,author_test)
+nB.result$correct = (nB.result[,1] == nB.result[,2])
+mean(nB.result[,3])
+```
+The Naive Bayes function gives us a out-of-sample accuracy of 44.16%. This means that about 44% of the time the naive bayes classfier will be able to attribute the articles to the correct author.
+```{r}
+#whose articles are difficult to distinguish?
+nB.False = nB.result[nB.result[,3]==FALSE,]
+nB.False <- table(nB.False[,2])
+
+print('Frequent mistakes:')
+print(sort(nB.False,decreasing = TRUE)/50)
+```
+
+As we can tell from the table above, each of these authors have 50 articles included in the training set, David Lawder has the highest misclassfy rate by using Naive Bayes classifier, followed by Jane Macartney.
+
+Let's try randomForest model to compare the result.
+
+```{r}
+library(randomForest)
+#prepare data for random forest
+share = intersect(names(X_train_df),names(X_test_df))
+X_train_df <- X_train_df[,share]
+X_test_df <- X_test_df[,share]
+
+#take care of invalid type for variable next
+names(X_train_df) = paste(names(X_train_df),'0',sep='')
+names(X_test_df) = paste(names(X_test_df),'0',sep='')
+X_train_df$author = author_train
+X_test_df$author = author_test
+
+rf.model = randomForest(author_train ~.,data=X_train_df,distribution = 'multinomial',ntree=500)
+# newdata=cbind(X_test_df,author_test)
+pred = predict(rf.model,newdat=X_test_df)
+rf.pred = data.frame(pred)
+rf.result = cbind(rf.pred,author_test)
+rf.result$correct = (rf.result[,1] == rf.result[,2])
+mean(rf.result[,3])
+```
+
+The random forest model returns a better accuracy rate than naive bayes classifier with a tree number of 500.
+
+```{r}
+rf.False = rf.result[rf.result[,3]==FALSE,]
+rf.False <- table(rf.False[,2])
+
+print('Frequent mistakes:')
+print(sort(rf.False,decreasing = TRUE)/50)
+```
+
+The most frequent mistake that Random Forest classifier makes is the author, Scott Hillis with a percentage of 94%.
+
+
 # Practice with association rule mining
 
 The groceries text file has a wide range of products including food products like whole milk, liver loaf and household goods like cleaner and detergent and other items. We apply market basket analysis here and use the Apriori algorithm to find patterns of user behaviour.
