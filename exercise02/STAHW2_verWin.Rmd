@@ -23,7 +23,7 @@ readerPlain = function(fname){
 							id=fname, language='en') }
 							
 ## get a list of author directories
-author_dirs = Sys.glob('ReutersC50/C50train/*')
+author_dirs = Sys.glob('data/ReutersC50/C50train/*')
 
 file_list = NULL
 #loop through all the documents for each authors
@@ -42,30 +42,25 @@ mynames = file_list %>%
 	unlist
 authorname = file_list %>%
 	{ strsplit(., '/', fixed=TRUE) } %>%
-	{ lapply(.,extract,3)} %>%
+	{ lapply(.,extract,4)} %>%
 	unlist
 names(all_docs)= mynames
 my_documents = Corpus(VectorSource(all_docs))
-```
 
-
-```{r}
 #preprocess/tokenize the corpus
 my_documents = tm_map(my_documents, content_transformer(tolower)) # make everything lowercase
 my_documents = tm_map(my_documents, content_transformer(removeNumbers)) # remove numbers
 my_documents = tm_map(my_documents, content_transformer(removePunctuation)) # remove punctuation
 my_documents = tm_map(my_documents, content_transformer(stripWhitespace)) ## remove excess white-space
 my_documents = tm_map(my_documents, content_transformer(removeWords), stopwords("en")) ##remove stopwords
-```
 
-```{r}
 ## create a doc-term-matrix
-DTM_all_doc = DocumentTermMatrix(my_documents)
+DTM_all_doc = DocumentTermMatrix(my_documents,control = list(weighting = weightTfIdf))
 # inspect(DTM_all_doc[1:10,1:20])
 DTM_all_doc = removeSparseTerms(DTM_all_doc, 0.95)
 
-X_train = as.matrix(DTM_all_doc)
-X_train = X_train/rowSums(X_train) 
+X_train_df = as.data.frame(as.matrix(DTM_all_doc))
+author_train = factor(authorname)
 ```
 
 
@@ -73,12 +68,12 @@ X_train = X_train/rowSums(X_train)
 #read in test data
 
 ## get a list of author directories
-author_dirs_test = Sys.glob('ReutersC50/C50test/*')
+author_dirs_test = Sys.glob('data/ReutersC50/C50test/*')
 
 file_list_test = NULL
 
 #loop through all the documents for each authors
-for(author in author_dirs) {
+for(author in author_dirs_test) {
 	author_name = substring(author, first=21)
 	files_to_add = Sys.glob(paste0(author, '/*.txt'))
 	file_list_test = append(file_list_test, files_to_add)
@@ -93,31 +88,67 @@ mynames_test = file_list_test %>%
 	unlist
 authorname_test = file_list_test %>%
 	{ strsplit(., '/', fixed=TRUE) } %>%
-	{ lapply(.,extract,3)} %>%
+	{ lapply(.,extract,4)} %>%
 	unlist
 names(all_docs_test)= mynames_test
-my_documents = Corpus(VectorSource(all_docs))
+my_documents_test = Corpus(VectorSource(all_docs_test))
 #preprocess/tokenize the corpus
-my_documents = tm_map(my_documents, content_transformer(tolower)) # make everything lowercase
-my_documents = tm_map(my_documents, content_transformer(removeNumbers)) # remove numbers
-my_documents = tm_map(my_documents, content_transformer(removePunctuation)) # remove punctuation
-my_documents = tm_map(my_documents, content_transformer(stripWhitespace)) ## remove excess white-space
-my_documents = tm_map(my_documents, content_transformer(removeWords), stopwords("en")) ##remove stopwords
+my_documents_test = tm_map(my_documents_test, content_transformer(tolower)) # make everything lowercase
+my_documents_test = tm_map(my_documents_test, content_transformer(removeNumbers)) # remove numbers
+my_documents_test = tm_map(my_documents_test, content_transformer(removePunctuation)) # remove punctuation
+my_documents_test = tm_map(my_documents_test, content_transformer(removeWords), stopwords("en")) ##remove stopwords
+my_documents_test = tm_map(my_documents_test, content_transformer(stripWhitespace)) ## remove excess white-space
 ## create a doc-term-matrix
-DTM_all_doc = DocumentTermMatrix(my_documents)
-# inspect(DTM_all_doc[1:10,1:20])
-DTM_all_doc = removeSparseTerms(DTM_all_doc, 0.95)
-
-X_test = as.matrix(DTM_all_doc)
-X_test = X_test/rowSums(X_test)
+DTM_all_doc_test = DocumentTermMatrix(my_documents_test,control = list(weighting = weightTfIdf))
+# Remove sparse terms
+DTM_all_doc_test = removeSparseTerms(DTM_all_doc_test, 0.95)
+#put testing data in dataframe form
+X_test_df = as.data.frame(as.matrix(DTM_all_doc_test))
+author_test = factor(authorname_test)
 ```
+
+After preparing the data, we would like to fit a naivebayes model and a logistic model to the data. We would use the naivebayes library to fit the first model. Then, we will compare the percentage of correctness of the two models.
 
 ```{r}
+#Naive Bayes
 library(naivebayes)
+nB.model = naive_bayes(author_train~.,data=X_train_df)
+nB.pred = data.frame(predict(nB.model,X_test_df))
+nB.result = cbind(nB.pred,author_test)
+nB.result$correct = (nB.result[,1] == nB.result[,2])
+mean(nB.result[,3])
+#sum(result[,3])/length(author_test)
+```
+The Naive Bayes function gives us a out-of-sample accuracy of 44.16%. This means that about 44% of the time the naive bayes classfier will be able to attribute the articles to the correct author.
+```{r}
+#whose articles are difficult to distinguish?
+nB.False = nB.result[nB.result[,3]==FALSE,]
+nB.False <- table(nB.False[,2])
 
-model_nB = naive_bayes(x = X_train, y = names(all_docs))
-
+print('Frequent mistakes:')
+print(sort(nB.False,decreasing = TRUE)/50)
 ```
 
+As we can tell from the table above, each of these authors have 50 articles included in the training set, David Lawder has the highest misclassfy rate by using Naive Bayes classifier, followed by Jane Macartney.
 
+Let's try a different model to compare the result.
+
+```{r message=FALSE}
+#Logistic Regression
+library(nnet)
+gbm.model = gbm(author_train~.,data=X_train_df,distribution='multinomial',cv.fold2)
+gbm.pred = data.frame(predict(gbm.model,X_test_df))
+gbm.result = cbind(gbm.pred,author_test)
+gbm.result$correct = (gbm.result[,1] == gbm.result[,2])
+mean(gbm.result[,3])
+```
+```{r}
+require(gbm)
+library(dplyr)
+gbm.model = gbm.fit(x=X_train_df,y=author_train,distribution = 'multinomial',n.tree= 50)
+
+```
+```{r}
+
+```
 
