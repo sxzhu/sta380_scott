@@ -8,9 +8,11 @@ output:
 ---
 
 # Flights at ABIA
+
 "Your task is to create a figure, or set of related figures, that tell an interesting story about flights into and out of Austin. You can annotate the figure and briefly describe it, but strive to make it as stand-alone as possible. It shouldn't need many, many paragraphs to convey its meaning. Rather, the figure should speak for itself as far as possible. "
 
 For our first section of exploratory data analysis, we decided to focus on airlines to see if we could draw any insights about which Airlines were more reliable in terms of delays and cancellations. We then looked into average arrival and average departure delay times (in minutes) each airline had when flying into or out of Austin.
+
 ```{r, echo=TRUE}
 airlinedata = read.csv("ABIA.csv")
 #calculating percentage of flights cancelled for each airline
@@ -64,6 +66,7 @@ barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
 
 
 ```
+
 The top 3 airlines who had the longest arrival delay times were EV- Express Jet, B6-Jet Blue airways, and YV-Mesa Airlines.
 The top 3 airlines who had the highest percentage of arrival delays were NW-Northwest, DL-Delta, and OH-PSA airlines. You can see that these top 3 categories differ, so although one airline may have long arrival delay times on average, it does not mean they necessariy mean they are delayed the most.
 
@@ -101,6 +104,7 @@ The top 3 airlines who had the longest departure delay times were OH- PSA Airlin
 The top 3 airlines who had the highest percentage of departure delays were EV-Express Jet, WN-Southwest Airlines , and CO-Continental Airlines. You can see that these top 3 categories differ, so although one airline may have long departure delay times on average, it does not mean they necessariy mean they are delayed the most. The top 3 categories for the arrival and departure average delay times are similar, but for the % of delays for both departure and arrivals, these top 3 categories differ.
 
 For our next part of the analysis we focused more on which dates (time, days, months) of the year were the most reliable to fly on. We used a subset of the data, using only the rows where Departure Delay was greater than 0 (i.e. showing a departure delay took place). We did this becuase the departure delay variable focused on people in Austin, who would be flying out of Austin.
+
 ```{r, echo=TRUE}
 
 delays = airlinedata[which(airlinedata[,16]>0),]
@@ -123,6 +127,7 @@ plot(dfmm$delays.Month, dfmm$delays.DepDelay,
 ```
 
 The highest amount of departure delays happened in March and June, but as you can tell from the plots above, the month with the longest departure delays (on average) is in Decemember.
+
 ```{r, echo=TRUE}
 
 delays = airlinedata[which(airlinedata[,16]>0),]
@@ -145,6 +150,7 @@ plot(dfmdays$delays.DayOfWeek, dfmdays$delays.DepDelay,
 ```
 
 Although Friday had the highest amount of delays, the delays were not necessarily the longest. The longest delays, on average, happened on Sunday.
+
 ```{r, echo=TRUE}
 
 delays = airlinedata[which(airlinedata[,16]>0),]
@@ -213,11 +219,16 @@ names(all_docs)= mynames
 my_documents = Corpus(VectorSource(all_docs))
 
 #preprocess/tokenize the corpus
-my_documents = tm_map(my_documents, content_transformer(tolower)) # make everything lowercase
-my_documents = tm_map(my_documents, content_transformer(removeNumbers)) # remove numbers
-my_documents = tm_map(my_documents, content_transformer(removePunctuation)) # remove punctuation
-my_documents = tm_map(my_documents, content_transformer(stripWhitespace)) ## remove excess white-space
-my_documents = tm_map(my_documents, content_transformer(removeWords), stopwords("en")) ##remove stopwords
+# make everything lowercase
+my_documents = tm_map(my_documents, content_transformer(tolower))
+# remove numbers
+my_documents = tm_map(my_documents, content_transformer(removeNumbers))
+# remove punctuation
+my_documents = tm_map(my_documents, content_transformer(removePunctuation)) 
+# remove excess white-space
+my_documents = tm_map(my_documents, content_transformer(stripWhitespace))
+#remove stopwords
+my_documents = tm_map(my_documents, content_transformer(removeWords), stopwords("en"))
 
 ## create a doc-term-matrix
 DTM_all_doc = DocumentTermMatrix(my_documents,control = list(weighting = weightTfIdf))
@@ -259,11 +270,16 @@ authorname_test = file_list_test %>%
 names(all_docs_test)= mynames_test
 my_documents_test = Corpus(VectorSource(all_docs_test))
 #preprocess/tokenize the corpus
-my_documents_test = tm_map(my_documents_test, content_transformer(tolower)) # make everything lowercase
-my_documents_test = tm_map(my_documents_test, content_transformer(removeNumbers)) # remove numbers
-my_documents_test = tm_map(my_documents_test, content_transformer(removePunctuation)) # remove punctuation
-my_documents_test = tm_map(my_documents_test, content_transformer(removeWords), stopwords("en")) ##remove stopwords
-my_documents_test = tm_map(my_documents_test, content_transformer(stripWhitespace)) ## remove excess white-space
+# make everything lowercase
+my_documents_test = tm_map(my_documents_test, content_transformer(tolower)) 
+# remove numbers
+my_documents_test = tm_map(my_documents_test, content_transformer(removeNumbers)) 
+# remove punctuation
+my_documents_test = tm_map(my_documents_test, content_transformer(removePunctuation))
+# remove stopwords
+my_documents_test = tm_map(my_documents_test, content_transformer(removeWords), stopwords("en"))
+# remove excess white-space
+my_documents_test = tm_map(my_documents_test, content_transformer(stripWhitespace))
 ## create a doc-term-matrix
 DTM_all_doc_test = DocumentTermMatrix(my_documents_test,control = list(weighting = weightTfIdf))
 # Remove sparse terms
@@ -345,7 +361,8 @@ library(arules)
 library(reshape2)
 library(plyr)
 library(arulesViz)
-groceries = read.transactions(file = "groceries.txt", rm.duplicates = TRUE, format = "basket", sep = ',')
+groceries = read.transactions(file = "groceries.txt", rm.duplicates = TRUE,
+                              format = "basket", sep = ',')
 ```
 
 The read.transactions() reads a data file and creates a transactions object. 
@@ -363,7 +380,8 @@ There are 169 unique grocery store items.
 
 We next plot the top 20 items by frequency
 ```{r}
-itemFrequencyPlot(groceries,topN=20,type = "absolute", col = 'blue', xlab = 'Item', main = 'Frequency of Item Purchases')
+itemFrequencyPlot(groceries,topN=20,type = "absolute", col = 'blue', xlab = 'Item', 
+                  main = 'Frequency of Item Purchases')
 ```
 
 We see that whole milk, other vegetables and buns are some of the most likely to be purchased items based on various itemsets
