@@ -40,6 +40,10 @@ mynames = file_list %>%
 	{ lapply(., tail, n=2) } %>%
 	{ lapply(., paste0, collapse = '') } %>%
 	unlist
+authorname = file_list %>%
+	{ strsplit(., '/', fixed=TRUE) } %>%
+	{ lapply(.,extract,3)} %>%
+	unlist
 names(all_docs)= mynames
 my_documents = Corpus(VectorSource(all_docs))
 ```
@@ -86,6 +90,10 @@ mynames_test = file_list_test %>%
 	{ strsplit(., '/', fixed=TRUE) } %>%
 	{ lapply(., tail, n=2) } %>%
 	{ lapply(., paste0, collapse = '') } %>%
+	unlist
+authorname_test = file_list_test %>%
+	{ strsplit(., '/', fixed=TRUE) } %>%
+	{ lapply(.,extract,3)} %>%
 	unlist
 names(all_docs_test)= mynames_test
 my_documents = Corpus(VectorSource(all_docs))
