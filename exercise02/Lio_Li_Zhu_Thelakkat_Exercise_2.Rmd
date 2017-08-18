@@ -1,0 +1,258 @@
+---
+title: "Exercise 2"
+author: "Lio, Lio, Zhu, Thelakkat"
+date: "August 13, 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Flights at ABIA
+"Your task is to create a figure, or set of related figures, that tell an interesting story about flights into and out of Austin. You can annotate the figure and briefly describe it, but strive to make it as stand-alone as possible. It shouldn't need many, many paragraphs to convey its meaning. Rather, the figure should speak for itself as far as possible. "
+
+For our first section of exploratory data analysis, we decided to focus on airlines to see if we could draw any insights about which Airlines were more reliable in terms of delays and cancellations. We then looked into average arrival and average departure delay times (in minutes) each airline had when flying into or out of Austin.
+```{r, echo=TRUE}
+airlinedata = read.csv("ABIA.csv")
+#calculating percentage of flights cancelled for each airline
+
+dfcancel = data.frame(aggregate(airlinedata$Cancelled~ airlinedata$UniqueCarrier, 
+                                airlinedata ,sum))
+
+df = data.frame(aggregate(airlinedata$FlightNum~ airlinedata$UniqueCarrier, 
+                          airlinedata, length))
+
+finaldf = merge(dfcancel, df)
+finaldf = within(finaldf, percent <- airlinedata.Cancelled/airlinedata.FlightNum)
+finaldf = finaldf[order(finaldf$percent),]
+
+barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "% of Flights Cancelled",
+        main = "% of Flights Cancelled per Airline", las=2, space=.5, col='beige', 
+        names.arg=c("NW", "F9", "US",'WN', "XE", "UA", "DL","CO", "YV",
+                    "B6","OO", "EV", "OH", "9E", "AA", "MQ"))
+
+```
+
+
+```{r, echo=TRUE}
+
+arrivaldelays = airlinedata[which(airlinedata[,15]>0),]
+df3 = data.frame(aggregate(arrivaldelays$ArrDelay~ arrivaldelays$UniqueCarrier, 
+                           arrivaldelays, mean))
+df4 = df3[order(df3$arrivaldelays.ArrDelay),]
+fix(df4)
+
+barplot(df4$arrivaldelays.ArrDelay, names = df4$arrivaldelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "Avg. Arrival Delays (minutes)",
+        main = "Avg. Arrival Delay times per Airline", las=2, space=.5, col='coral')
+
+#calculating percentage of flights delayed for each airline
+
+df33 = data.frame(aggregate(arrivaldelays$ArrDelay~ arrivaldelays$UniqueCarrier, 
+                           arrivaldelays, length))
+df = data.frame(aggregate(airlinedata$FlightNum~ airlinedata$UniqueCarrier, 
+                          airlinedata, length))
+
+finaldf = merge(df33, df, by.x="arrivaldelays.UniqueCarrier", by.y="airlinedata.UniqueCarrier")
+finaldf = within(finaldf, percent <- arrivaldelays.ArrDelay/airlinedata.FlightNum)
+finaldf = finaldf[order(finaldf$percent),]
+barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "% of Arrivals Delayed",
+        main = "% of Arrivals delayed per Airline", las=2, space=.5, col='coral')
+
+
+
+```
+
+
+```{r, echo=TRUE}
+
+departdelays = airlinedata[which(airlinedata[,16]>0),]
+df5 = data.frame(aggregate(departdelays$DepDelay~ departdelays$UniqueCarrier, 
+                           departdelays, mean))
+
+df6 = df5[order(df5$departdelays.DepDelay),]
+
+barplot(df6$departdelays.DepDelay, names = df6$departdelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "Avg. Departure Delays (minutes)",
+        main = "Avg. Departure Delay times per Airline", las=2, space=.5,
+        col='darkolivegreen3')
+
+#calculating percentage of flights delayed for each airline
+
+df55 = data.frame(aggregate(departdelays$DepDelay~ departdelays$UniqueCarrier, 
+                           departdelays, length))
+
+df = data.frame(aggregate(airlinedata$FlightNum~ airlinedata$UniqueCarrier, airlinedata, length))
+
+finaldf = merge(df55, df, by.x="departdelays.UniqueCarrier", by.y="airlinedata.UniqueCarrier")
+finaldf = within(finaldf, percent <- departdelays.DepDelay/airlinedata.FlightNum)
+finaldf = finaldf[order(finaldf$percent),]
+barplot(finaldf$percent, names = finaldf$departdelays.UniqueCarrier,
+        xlab = "Unique Carrier", ylab = "% of Depatures Delayed",
+        main = "% of Departures Delayed per Airline", las=2, space=.5, col='darkolivegreen3')
+
+
+```
+
+For our next part of the analysis we focused more on which dates (time, days, months) of the year were the most reliable to fly on. We used a subset of the data, using only the rows where Departure Delay was greater than 0 (i.e. showing a departure delay took place). We did this becuase the departure delay variable focused on people in Austin, who would be flying out of Austin.
+```{r, echo=TRUE}
+
+delays = airlinedata[which(airlinedata[,16]>0),]
+
+dfm = data.frame(aggregate(delays$DepDelay~ delays$Month, delays, length))
+
+plot(dfm$delays.Month, dfm$delays.DepDelay,
+        xlab = "Months", ylab = "# of Departure Delays",
+        main = "# of Departure Delays by Month", type='o',
+        col='lightpink4', lwd=2, pch=5)
+
+dfmm = data.frame(aggregate(delays$DepDelay~ delays$Month, delays, mean))
+
+
+plot(dfmm$delays.Month, dfmm$delays.DepDelay,
+        xlab = "Months", ylab = "Avg. Departure Delays (minutes)",
+        main = "Avg. Departure Delay times by Month", type='o',
+        col='lightpink4', lwd=2, pch=5)
+
+```
+
+The highest amount of departure delays happened in March and June, but as you can tell from the plots above, the month with the longest departure delays (on average) is in Decemember.
+```{r, echo=TRUE}
+
+delays = airlinedata[which(airlinedata[,16]>0),]
+
+dfday = data.frame(aggregate(delays$DepDelay~ delays$DayOfWeek, delays, length))
+
+plot(dfday$delays.DayOfWeek, dfday$delays.DepDelay,
+        xlab = "Day (1-Monday to 7-Sunday)", ylab = "# of Departure Delays",
+        main = "# of Departure Delays by Day", type='o',
+        col='lightpink2', lwd=2, pch=7)
+
+dfmdays = data.frame(aggregate(delays$DepDelay~ delays$DayOfWeek, delays, mean))
+
+
+plot(dfmdays$delays.DayOfWeek, dfmdays$delays.DepDelay,
+        xlab = "Day (1Monday to 7-Sunday)", ylab = "Avg. Departure Delays (minutes)",
+        main = "Avg. Departure Delay times by Day", type='o',
+        col='lightpink2', lwd=2, pch=7)
+
+```
+
+Although Friday had the highest amount of delays, the delays were not necessarily the longest. The longest delays, on average, happened on Sunday.
+```{r, echo=TRUE}
+
+delays = airlinedata[which(airlinedata[,16]>0),]
+
+dfhour = data.frame(aggregate(delays$DepDelay~ delays$DepTime, delays, length))
+
+
+plot(dfhour$delays.DepTime, dfhour$delays.DepDelay,
+        xlab = "Time (military time)", ylab = "# of Departure Delays",
+        main = "# of Departure Delays by Hour", type='o',
+        col='brown', lwd=2, pch=7)
+
+dfmhours = data.frame(aggregate(delays$DepDelay~ delays$DepTime, delays, mean))
+
+
+plot(dfmhours$delays.DepTime, dfmhours$delays.DepDelay,
+        xlab = "Time (military time)", ylab = "Avg. Departure Delays (minutes)",
+        main = "Avg. Departure Delay times by Hour", type='o',
+        col='brown', lwd=2, pch=7)
+
+```
+
+Lastly, it seems like the most delays happen in the middle of the day between 05:00 and 20:00. In contrast, barely any delays occur betwen 0:00 and 5:00, but when they do, they are very long. 
+
+
+# Practice with association rule mining
+
+The groceries text file has a wide range of products including food products like whole milk, liver loaf and household goods like cleaner and detergent and other items. We apply market basket analysis here and use the Apriori algorithm to find patterns of user behaviour.
+
+We first read in the groceries text file by using read.transactions. 
+
+```{r}
+rm(list=ls())
+library(arules)
+library(reshape2)
+library(plyr)
+library(arulesViz)
+groceries = read.transactions(file = "groceries.txt", rm.duplicates = TRUE, format = "basket", sep = ',')
+```
+
+The read.transactions() reads a data file and creates a transactions object. 
+The rm.duplicates in the above equation removes the duplicates just like lapply(groceries_list, unique) does.
+
+
+```{r}
+dim(groceries)
+```
+
+The groceries data has 9835 rows where each row is an associated list of items in the transaction. 
+There are 169 unique grocery store items. 
+
+
+
+We next plot the top 20 items by frequency
+```{r}
+itemFrequencyPlot(groceries,topN=20,type = "absolute", col = 'blue', xlab = 'Item', main = 'Frequency of Item Purchases')
+```
+
+We see that whole milk, other vegetables and buns are some of the most likely to be purchased items based on various itemsets
+The frequencies of items will become more relevant when results for different iterations of the Apriori algorithm are generated.
+
+We now apply the Apriori algorithm which is basically a bottoms-up approach used to identify frequent items and extend them to larger and large item sets as long as those item sets appear sufficiently often in the database.
+
+We juggle with different values of the three main parameters , namely Support (indication of how frequently the itemset appears in the dataset), Confidence (indication of how often the rule has been found to be true) and Lift (ratio of the observed support to that expected if X and Y were independent)
+
+#### Attempt 1 : 
+
+```{r}
+grocrules1 <- apriori(groceries, parameter=list(support=.01, confidence=.5, maxlen=4))
+inspect(grocrules1)
+```
+
+
+Here, we have 15 rules .
+
+The right hand side of all rules is either whole milk or other vegetables, and the items on the left are different combinations of other items that increase the likelihood of finding either milk or veggies in the same transaction.{Citrus fruit,root vegetables} and {root vegetables,tropical fruit} are three times more likely because of their high lift values.
+
+
+
+```{r}
+inspect(subset(grocrules1,subset=lift > 3))
+inspect(subset(grocrules1, subset=confidence > 0.5))
+inspect(subset(grocrules1, subset = support > .01 & confidence > 0.3))
+
+rules = apriori(groceries, parameter = list(support=.01, confidence=.3, target='rules'))
+plot(rules)
+```
+
+The plot shows that rules with high lift typically have slightly low support.
+
+We moved on to further iterations.
+
+#### Attempt 2 : 
+
+```{r}
+grocrules2 <- apriori(groceries,parameter=list(support=.02, confidence=.4, maxlen=6))
+inspect(grocrules2)
+```
+
+After trying different other combinations, we took support threshold as .02, so that only rules that are relevant to 2% of transactions or more are included. We took confidence as 0.4. Additionally, the maximum size was increased to 6 items, however this made no difference in practice as all rules containd two or less items.
+
+Here in rhs, we have predominantly whole milk and other vegetables, which are the frequently bought items. These are just showing us grocery patterns of users . Lift values have decreased from previous iterations.
+
+
+
+In conclusion,
+
+From a marketing perspective, iterations of the algorithm that allow for small cuts of data but require very strong associations produce the most actionable results. 
+
+Looking at the patterns of rules across all attempts, it is interesting to note that the strongest rules in every case were exclusively among food items. Other items such as garbage bags, cleaning products, etc. did not show up with much frequency. Anecdotally, it is likely that consumers simply buy these items when they run out, as opposed to on a weekly basis or in conjunction with other items, so their appearance is effectively random. 
+
+Many of the rules across all iterations were simply combinations of commonly-bought items. 
+
+If the grocery items have high support, confidence and lift values, then we can place them together in the grocery store. This is especially important where one item in a pair is very popular, and the other item is very high margin.
+
+The results can be used to drive targeted marketing campaigns. For each user, we pick a handful of products based on products they have bought to date which have both a high uplift and a high margin, and send them a e.g. personalized email or display ads etc.
