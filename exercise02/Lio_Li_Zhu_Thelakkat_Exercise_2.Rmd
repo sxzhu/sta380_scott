@@ -33,6 +33,7 @@ barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
 
 ```
 
+We took the percentage of flights cancelled for each airline, and the airline with the most cancellations was MQ-American Eagle, followed by American Airlines. Even though MQ was the highest, the percent of cancellation was still small, only being aroun 6% of the time.
 
 ```{r, echo=TRUE}
 
@@ -63,7 +64,8 @@ barplot(finaldf$percent, names = finaldf$arrivaldelays.UniqueCarrier,
 
 
 ```
-
+The top 3 airlines who had the longest arrival delay times were EV- Express Jet, B6-Jet Blue airways, and YV-Mesa Airlines.
+The top 3 airlines who had the highest percentage of arrival delays were NW-Northwest, DL-Delta, and OH-PSA airlines. You can see that these top 3 categories differ, so although one airline may have long arrival delay times on average, it does not mean they necessariy mean they are delayed the most.
 
 ```{r, echo=TRUE}
 
@@ -94,6 +96,9 @@ barplot(finaldf$percent, names = finaldf$departdelays.UniqueCarrier,
 
 
 ```
+
+The top 3 airlines who had the longest departure delay times were OH- PSA Airlines, B6-Jet Blue airways, and YV-Mesa Airlines.
+The top 3 airlines who had the highest percentage of departure delays were EV-Express Jet, WN-Southwest Airlines , and CO-Continental Airlines. You can see that these top 3 categories differ, so although one airline may have long departure delay times on average, it does not mean they necessariy mean they are delayed the most. The top 3 categories for the arrival and departure average delay times are similar, but for the % of delays for both departure and arrivals, these top 3 categories differ.
 
 For our next part of the analysis we focused more on which dates (time, days, months) of the year were the most reliable to fly on. We used a subset of the data, using only the rows where Departure Delay was greater than 0 (i.e. showing a departure delay took place). We did this becuase the departure delay variable focused on people in Austin, who would be flying out of Austin.
 ```{r, echo=TRUE}
