@@ -1,6 +1,6 @@
 ---
 title: "Exercise 2"
-author: "Lio, Lio, Zhu, Thelakkat"
+author: "Lio, Li, Zhu, Thelakkat"
 date: "August 13, 2017"
 output:
   pdf_document: default
@@ -289,7 +289,7 @@ X_test_df = as.data.frame(as.matrix(DTM_all_doc_test))
 author_test = factor(authorname_test)
 ```
 
-After preparing the data, we would like to fit a naivebayes model and a logistic model to the data. We would use the naivebayes library to fit the first model. Then, we will compare the percentage of correctness of the two models.
+After preparing the data, we would like to fit a naivebayes model and a random forest model to the data. We would use the naivebayes library to fit the first model. Then, we will compare the percentage of correctness of the two models.
 
 ```{r}
 #Naive Bayes
